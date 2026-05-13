@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profª Joyce Neres — Sistema de Consulta</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --preto:#0e0e0e;--carvao:#161616;--sup:#1e1e1e;--sup2:#252525;--sup3:#2e2e2e;
+  --em:#4d9e72;--em-c:#6dbf91;--em-p:rgba(77,158,114,0.12);--em-b:rgba(77,158,114,0.3);
+  --creme:#f0ebe0;--muted:#7a7570;--txt:#e8e4dc;--borda:rgba(255,255,255,0.08);
+  --vm:#d45050;--vmc:#e87070;--lj:#d4822a;--ljc:#e8a060;--az:#5a9fd4;--azc:#80b8e0;
+  --fd:'Playfair Display',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;
+  --r:10px;--rl:15px;
+}
+body{font-family:var(--fb);background:var(--preto);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.65}
+.app{max-width:920px;margin:0 auto;padding:0 0 100px}
+
+.hdr{background:var(--carvao);border-bottom:1px solid var(--borda);padding:0 36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;height:60px}
+.hdr-l{display:flex;align-items:baseline;gap:12px}
+.hdr-name{font-family:var(--fd);font-style:italic;color:var(--creme);font-size:17px;letter-spacing:.3px}
+.hdr-sep{width:4px;height:4px;border-radius:50%;background:var(--em);flex-shrink:0;margin-bottom:2px}
+.hdr-sys{font-size:10.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.hdr-badge{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:5px 13px;border-radius:20px;border:1px solid var(--em-b);color:var(--em-c);background:var(--em-p)}
+
+.tabs{background:var(--carvao);border-bottom:1px solid var(--borda);display:flex;padding:0 36px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:14px 16px;font-size:11.5px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;font-family:var(--fb);letter-spacing:.3px}
+.tab:hover{color:var(--em-c)}
+.tab.active{color:var(--creme);border-bottom-color:var(--em);font-weight:600}
+.tn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.06);color:var(--muted);font-size:9px;font-weight:700;margin-right:6px}
+.tab.active .tn{background:var(--em);color:#fff}
+
+.sec{padding:32px 36px;display:none}
+.sec.on{display:block}
+
+.hero{margin-bottom:22px}
+.hero-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--em);margin-bottom:5px}
+.hero-ttl{font-family:var(--fd);font-size:25px;font-style:italic;color:var(--creme);line-height:1.2}
+.hero-ttl b{font-style:normal;color:var(--em-c)}
+
+.card{background:var(--sup);border:1px solid var(--borda);border-radius:var(--rl);padding:22px;margin-bottom:14px}
+.card:hover{border-color:rgba(255,255,255,0.12)}
+.ctit{font-family:var(--fd);font-size:13px;color:var(--creme);font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:9px;letter-spacing:.2px}
+.ctit::before{content:'';width:2px;height:15px;background:var(--em);border-radius:2px;flex-shrink:0}
+.csub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+
+.uz{border:1.5px dashed var(--em-b);border-radius:var(--rl);padding:38px 24px;text-align:center;cursor:pointer;transition:all .25s;background:var(--em-p);position:relative}
+.uz:hover{border-color:var(--em);background:rgba(77,158,114,0.18)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-ico{font-size:30px;margin-bottom:10px;opacity:.75}
+.uz-ttl{font-family:var(--fd);font-style:italic;font-size:15px;color:var(--creme);margin-bottom:4px}
+.uz-sub{font-size:11.5px;color:var(--muted)}
+
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg.g3{grid-template-columns:1fr 1fr 1fr}
+.fgrp{display:flex;flex-direction:column;gap:4px}
+.fgrp.full{grid-column:1/-1}
+label{font-size:10px;font-weight:600;color:var(--em-c);letter-spacing:.8px;text-transform:uppercase}
+input,select,textarea{padding:10px 12px;border:1px solid var(--borda);border-radius:var(--r);font-family:var(--fb);font-size:13px;background:var(--sup2);color:var(--txt);transition:all .2s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--em);background:var(--sup3);box-shadow:0 0 0 3px rgba(77,158,114,0.13)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.65}
+input[readonly]{background:var(--sup);color:var(--muted)}
+select option{background:var(--sup2)}
+textarea{resize:vertical;min-height:70px}
+input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var(--sup3);border-radius:2px}
+
+.disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dg{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--sup2);border-radius:var(--r);border:1px solid var(--borda)}
+.dg-h{display:flex;justify-content:space-between;align-items:center}
+.dg-nm{font-size:12px;font-weight:600}
+.dg-vl{font-size:20px;font-weight:700;min-width:26px;text-align:right}
+.dg-d{font-size:11px;color:var(--muted);line-height:1.5}
+.dg-nd{font-size:10px;color:rgba(255,255,255,.3);font-style:italic;margin-top:4px}
+
+.hexg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hi{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:14px}
+.hlbl{font-size:10px;font-weight:600;color:var(--em-c);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.hrow{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.htag{font-size:10px;color:var(--muted);width:28px;flex-shrink:0}
+.hvl{font-size:13px;font-weight:700;color:var(--creme);min-width:16px;text-align:center}
+
+.ei{display:flex;align-items:center;gap:13px;padding:12px 15px;border-radius:var(--r);margin-bottom:8px;border:1px solid var(--borda);cursor:pointer;transition:all .2s;background:var(--sup2)}
+.ei:hover{border-color:var(--em-b);background:var(--sup3)}
+.ei.sel{border-color:var(--em);background:var(--em-p)}
+.edot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--muted);flex-shrink:0;transition:all .2s}
+.ei.sel .edot{background:var(--em);border-color:var(--em)}
+.ettl{font-size:13px;font-weight:600;color:var(--creme)}
+.esub{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r);font-family:var(--fb);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;letter-spacing:.2px}
+.bp{background:var(--em);color:#fff}
+.bp:hover{background:var(--em-c);color:var(--preto)}
+.bo{background:transparent;color:var(--em-c);border:1px solid var(--em-b)}
+.bo:hover{background:var(--em-p);border-color:var(--em)}
+.bg{background:transparent;color:var(--muted);border:1px solid var(--borda)}
+.bg:hover{background:var(--sup2);color:var(--txt)}
+.brow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+.sb{background:var(--em-p);border:1px solid var(--em-b);border-radius:var(--r);padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--em-c);margin-bottom:14px}
+.sd{width:7px;height:7px;border-radius:50%;background:var(--em);animation:pl 1.5s infinite;flex-shrink:0}
+@keyframes pl{0%,100%{opacity:1}50%{opacity:.3}}
+.lb{background:rgba(255,255,255,0.07);border-radius:3px;height:3px;overflow:hidden;flex:1;margin-left:10px}
+.lf{height:100%;background:var(--em);border-radius:3px;animation:la 1.8s ease-in-out infinite;width:55%}
+@keyframes la{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+.aib{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:15px 17px;font-size:13px;line-height:1.85;color:var(--txt);white-space:pre-wrap}
+.aied{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:15px;font-size:13px;line-height:1.85;color:var(--txt);width:100%;min-height:200px;font-family:var(--fb);resize:vertical}
+.aied:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(77,158,114,0.13)}
+.div{border:none;border-top:1px solid var(--borda);margin:18px 0}
+
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}
+.met{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:12px 14px}
+.mlbl{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;letter-spacing:.6px;margin-bottom:3px}
+.mvl{font-size:14px;font-weight:700;color:var(--creme)}
+.mve{color:var(--em-c)}
+
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px}
+.tg{background:rgba(77,158,114,0.18);color:var(--em-c);border:1px solid var(--em-b)}
+.tr{background:rgba(212,80,80,0.15);color:var(--vmc);border:1px solid rgba(212,80,80,0.3)}
+.to{background:rgba(212,130,42,0.15);color:var(--ljc);border:1px solid rgba(212,130,42,0.3)}
+
+.rb{display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.rb-b{background:rgba(77,158,114,0.18);color:var(--em-c);border:1px solid var(--em-b)}
+.rb-m{background:rgba(212,130,42,0.18);color:var(--ljc);border:1px solid rgba(212,130,42,0.35)}
+.rb-a{background:rgba(212,80,80,0.18);color:var(--vmc);border:1px solid rgba(212,80,80,0.35)}
+
+.pcs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.pc{border-radius:var(--r);padding:13px 12px}
+.pcn{font-size:11px;font-weight:600;margin-bottom:3px;opacity:.85}
+.pcs_{font-size:21px;font-weight:700}
+.pcv{background:rgba(212,80,80,0.14);border:1px solid rgba(212,80,80,0.3)}
+.pco{background:rgba(212,130,42,0.14);border:1px solid rgba(212,130,42,0.3)}
+.pcg{background:rgba(77,158,114,0.14);border:1px solid var(--em-b)}
+.pca{background:rgba(90,159,212,0.14);border:1px solid rgba(90,159,212,0.3)}
+
+.cw{position:relative;margin:14px 0}
+
+@media print{
+  .hdr,.tabs,.brow,.uz,.btn{display:none!important}
+  body{background:#fff!important;color:#111!important}
+  .app{max-width:100%!important}
+  .sec{display:block!important;padding:10px!important}
+  .card{background:#fff!important;border:1px solid #ddd!important;box-shadow:none!important;break-inside:avoid;margin-bottom:10px!important}
+  .aib,.met,.hi,.ei{background:#f8f8f8!important;color:#111!important}
+  .ctit,.mvl,.ettl,.pcn{color:#111!important}
+}
+@media(max-width:600px){
+  .fg,.disc-grid,.hexg,.mg,.pcs{grid-template-columns:1fr}
+  .sec,.hdr,.tabs{padding-left:18px;padding-right:18px}
+  .hdr{padding:0 18px}
+  .hero-ttl{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-name">Profª Joyce Neres</div>
+    <div class="hdr-sep"></div>
+    <div class="hdr-sys">Sistema de Consulta</div>
+  </div>
+  <div class="hdr-badge">JN Consultoria</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="gT(0)"><span class="tn">1</span>Anamnese</button>
+  <button class="tab" onclick="gT(1)"><span class="tn">2</span>Análise IA</button>
+  <button class="tab" onclick="gT(2)"><span class="tn">3</span>Risco Clínico</button>
+  <button class="tab" onclick="gT(3)"><span class="tn">4</span>Perfil DISC</button>
+  <button class="tab" onclick="gT(4)"><span class="tn">5</span>Motivacional</button>
+  <button class="tab" onclick="gT(5)"><span class="tn">6</span>Bem-Estar</button>
+  <button class="tab" onclick="gT(6)"><span class="tn">7</span>Relatório</button>
+</div>
+
+<!-- ABA 1 -->
+<div class="sec on" id="t0">
+  <div class="hero"><div class="hero-lbl">Etapa 01</div><div class="hero-ttl">Dados do <b>Aluno</b></div></div>
+  <div class="card">
+    <div class="ctit">Upload da Anamnese</div>
+    <div class="uz" id="uz">
+      <input type="file" id="fi" accept=".pdf,image/*" onchange="upld(event)">
+      <div class="uz-ico">📄</div>
+      <div class="uz-ttl">Solte o PDF aqui ou clique para selecionar</div>
+      <div class="uz-sub">PDF ou imagem · A IA extrai os dados automaticamente</div>
+    </div>
+    <div id="ust" style="display:none;margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <div class="ctit">Dados Gerais — Revisão e Complemento</div>
+    <div class="fg">
+      <div class="fgrp full"><label>Nome completo</label><input type="text" id="fn" placeholder="Nome do(a) aluno(a)"></div>
+      <div class="fgrp"><label>Sexo</label><select id="fs"><option value="">Selecionar</option><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+      <div class="fgrp"><label>Idade</label><input type="number" id="fi2" placeholder="29" min="10" max="100"></div>
+      <div class="fgrp"><label>Peso (kg)</label><input type="number" id="fp" placeholder="65.0" step="0.1" oninput="cIMC()"></div>
+      <div class="fgrp"><label>Altura (cm)</label><input type="number" id="fh" placeholder="165" oninput="cIMC()"></div>
+      <div class="fgrp"><label>IMC — calculado</label><input type="text" id="fimc" readonly placeholder="Automático"></div>
+      <div class="fgrp"><label>Cintura (cm)</label><input type="number" id="fci" placeholder="Opcional"></div>
+      <div class="fgrp"><label>PA sistólica (mmHg)</label><input type="number" id="fpas" placeholder="Ex: 120"></div>
+      <div class="fgrp"><label>Colesterol total (mg/dL)</label><input type="number" id="fcol" placeholder="Ex: 180"></div>
+      <div class="fgrp"><label>HDL-C (mg/dL)</label><input type="number" id="fhdl" placeholder="Ex: 55"></div>
+      <div class="fgrp"><label>Diabetes</label><select id="fdb"><option value="nao">Não</option><option value="pre">Pré-diabetes</option><option value="sim">Sim</option></select></div>
+      <div class="fgrp"><label>Tabagismo</label><select id="ftab"><option value="nao">Não fumante</option><option value="sim">Fumante ativo</option><option value="ex">Ex-fumante (&lt;6 meses)</option></select></div>
+      <div class="fgrp"><label>Anti-hipertensivo</label><select id="fah"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+      <div class="fgrp"><label>Histórico familiar DCV</label><select id="fhd"><option value="nao">Sem eventos</option><option value="sim">Com eventos (pai/mãe/irmão)</option></select></div>
+      <div class="fgrp"><label>Nível de atividade física</label><select id="faf"><option value="sedentario">Sedentário (&lt;150 min/sem)</option><option value="leve">Leve (1–2×/sem)</option><option value="moderado">Moderado (3–4×/sem)</option><option value="ativo">Ativo (≥5×/sem)</option></select></div>
+      <div class="fgrp"><label>Histórico familiar DM2</label><select id="fhdm"><option value="0">Nenhum (0 pts)</option><option value="3">Avô / Tio / Primo (3 pts)</option><option value="5">Pai / Mãe / Irmão (5 pts)</option></select></div>
+      <div class="fgrp full"><label>Objetivo principal</label><input type="text" id="fobj" placeholder="Ex: hipertrofia, emagrecimento, condicionamento..."></div>
+      <div class="fgrp full"><label>Condições especiais / Diagnósticos</label><textarea id="fcon" placeholder="Lipedema, HAS, lesões, cirurgias, limitações..."></textarea></div>
+      <div class="fgrp full"><label>Medicamentos em uso</label><input type="text" id="fmed" placeholder="Ex: Escitalopram, Trazodona, Metformina..."></div>
+      <div class="fgrp full"><label>Observações clínicas da consulta</label><textarea id="fobs" placeholder="Comportamento, comunicação, contexto de vida, impressões..."></textarea></div>
+    </div>
+    <div class="brow">
+      <button class="btn bp" onclick="cIMC()">Calcular IMC</button>
+      <button class="btn bo" onclick="gT(1)">Analisar com IA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 2 -->
+<div class="sec" id="t1">
+  <div class="hero"><div class="hero-lbl">Etapa 02</div><div class="hero-ttl">Análise <b>Clínica</b></div></div>
+  <div class="card">
+    <div class="csub">A IA gera um parecer contextual a partir dos dados preenchidos. O resultado é editável — ajuste antes de incluir no relatório.</div>
+    <button class="btn bp" onclick="anIA()" id="bnia">Gerar Análise Clínica com IA</button>
+    <div id="iast" style="display:none;margin-top:14px"></div>
+    <div id="iaout" style="display:none;margin-top:18px">
+      <hr class="div">
+      <div class="ctit">Resultado — editável</div>
+      <textarea class="aied" id="iate"></textarea>
+      <div class="brow">
+        <button class="btn bg" onclick="cpIA()">Copiar texto</button>
+        <button class="btn bo" onclick="gT(2)">Ver Risco Clínico →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 3 -->
+<div class="sec" id="t2">
+  <div class="hero"><div class="hero-lbl">Etapa 03</div><div class="hero-ttl">Triagem de <b>Risco</b></div></div>
+  <div class="card">
+    <div class="ctit">Risco Cardiovascular — Framingham Risk Score</div>
+    <div class="csub">ACSM Guidelines for Exercise Testing and Prescription, 11ª ed.</div>
+    <div id="rFRS" style="margin-bottom:12px"></div>
+    <button class="btn bp" onclick="cFRS()">Calcular Framingham</button>
+  </div>
+  <div class="card">
+    <div class="ctit">Risco para Diabetes Tipo 2 — FINDRISC</div>
+    <div id="rFDR" style="margin-bottom:12px"></div>
+    <button class="btn bp" onclick="cFDR()">Calcular FINDRISC</button>
+  </div>
+  <div class="card">
+    <div class="ctit">Fatores de Risco — Triagem ACSM</div>
+    <div id="rACSM" style="margin-bottom:12px"></div>
+    <button class="btn bp" onclick="cACSM()">Avaliar Triagem ACSM</button>
+  </div>
+</div>
+
+<!-- ABA 4 -->
+<div class="sec" id="t3">
+  <div class="hero"><div class="hero-lbl">Etapa 04</div><div class="hero-ttl">Perfil <b>Comportamental</b></div></div>
+  <div class="card">
+    <div class="csub">Classifique 0–10 cada dimensão com base na anamnese e observação da consulta. Objetivo: adaptar a comunicação ao perfil dominante para melhor adesão — Método DISC / LASEr.</div>
+    <div class="disc-grid">
+      <div class="dg">
+        <div class="dg-h"><span class="dg-nm" style="color:var(--vmc)">🔴 Diretivo</span><span class="dg-vl" style="color:var(--vmc)" id="vD">5</span></div>
+        <input type="range" min="0" max="10" value="5" id="slD" oninput="upD()" style="accent-color:var(--vm)">
+        <div class="dg-d">Confiante · Líder · Focado em resultados · Direto · Independente</div>
+        <div class="dg-nd">Necessidade: Reconhecimento e importância</div>
+      </div>
+      <div class="dg">
+        <div class="dg-h"><span class="dg-nm" style="color:var(--ljc)">🟠 Influenciador</span><span class="dg-vl" style="color:var(--ljc)" id="vI">5</span></div>
+        <input type="range" min="0" max="10" value="5" id="slI" oninput="upD()" style="accent-color:var(--lj)">
+        <div class="dg-d">Divertido · Social · Explorador · Entusiasta · Simpático</div>
+        <div class="dg-nd">Necessidade: Experiência e novidade</div>
+      </div>
+      <div class="dg">
+        <div class="dg-h"><span class="dg-nm" style="color:var(--em-c)">🟢 Estável</span><span class="dg-vl" style="color:var(--em-c)" id="vS">5</span></div>
+        <input type="range" min="0" max="10" value="5" id="slS" oninput="upD()" style="accent-color:var(--em)">
+        <div class="dg-d">Meigo · Emocional · Apoiador · Harmonioso · Leal</div>
+        <div class="dg-nd">Necessidade: Conexão e pertencimento</div>
+      </div>
+      <div class="dg">
+        <div class="dg-h"><span class="dg-nm" style="color:var(--azc)">🔵 Cauteloso</span><span class="dg-vl" style="color:var(--azc)" id="vC">5</span></div>
+        <input type="range" min="0" max="10" value="5" id="slC" oninput="upD()" style="accent-color:var(--az)">
+        <div class="dg-d">Analítico · Detalhista · Planejador · Busca segurança · Preciso</div>
+        <div class="dg-nd">Necessidade: Segurança, conhecimento e controle</div>
+      </div>
+    </div>
+    <div class="cw" style="height:240px;margin-top:22px">
+      <canvas id="dchart" role="img" aria-label="Radar DISC">Perfil DISC.</canvas>
+    </div>
+    <hr class="div">
+    <div id="dAnal"></div>
+  </div>
+  <div class="card" id="dEst" style="display:none">
+    <div class="ctit">Estratégias de Comunicação — Perfil Dominante</div>
+    <div id="dEstT"></div>
+  </div>
+</div>
+
+<!-- ABA 5 -->
+<div class="sec" id="t4">
+  <div class="hero"><div class="hero-lbl">Etapa 05</div><div class="hero-ttl">Estágio <b>Motivacional</b></div></div>
+  <div class="card">
+    <div class="csub">Selecione o(s) estágio(s) identificados para o aluno. Referência: Prochaska et al. (2008).</div>
+    <div class="ei" onclick="tgE(this,'manutencao')"><div class="edot"></div><div><div class="ettl">Manutenção — "Consegui!"</div><div class="esub">Mantém comportamento há mais de 6 meses</div></div></div>
+    <div class="ei" onclick="tgE(this,'acao')"><div class="edot"></div><div><div class="ettl">Ação — "Faço!"</div><div class="esub">Mudança iniciada há menos de 6 meses</div></div></div>
+    <div class="ei" onclick="tgE(this,'preparacao')"><div class="edot"></div><div><div class="ettl">Preparação — "Vou fazer!"</div><div class="esub">Planeja agir nos próximos 30 dias</div></div></div>
+    <div class="ei" onclick="tgE(this,'contemplacao')"><div class="edot"></div><div><div class="ettl">Contemplação — "Quero fazer!"</div><div class="esub">Intenção de mudar nos próximos 6 meses</div></div></div>
+    <div class="ei" onclick="tgE(this,'precontemplacao')"><div class="edot"></div><div><div class="ettl">Pré-contemplação — "Não quero"</div><div class="esub">Sem intenção de mudança no momento</div></div></div>
+    <hr class="div">
+    <div class="fgrp full">
+      <label>Estratégia motivacional — TAD / abordagem recomendada</label>
+      <textarea id="fmot" placeholder="Ex: Motivação intrínseca via TAD — autonomia, competência e vínculo. Ressignificação do exercício como autocuidado..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 6 -->
+<div class="sec" id="t5">
+  <div class="hero"><div class="hero-lbl">Etapa 06</div><div class="hero-ttl">Hexagrama de <b>Bem-Estar</b></div></div>
+  <div class="card">
+    <div class="csub">Pontuação: 0 = carência total · 5 = dedicação total. Marque Atual (vermelho) e Ideal (verde) por dimensão.</div>
+    <div class="hexg">
+      <div class="hi"><div class="hlbl">Saúde e Autocuidado</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA0" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv0">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI0" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv0">4</span></div></div>
+      <div class="hi"><div class="hlbl">Atividade Física</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA1" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv1">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="5" id="hI1" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv1">5</span></div></div>
+      <div class="hi"><div class="hlbl">Alimentação</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="3" id="hA2" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv2">3</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI2" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv2">4</span></div></div>
+      <div class="hi"><div class="hlbl">Trabalho e Educação</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="3" id="hA3" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv3">3</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI3" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv3">4</span></div></div>
+      <div class="hi"><div class="hlbl">Lazer e Relações Sociais</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA4" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv4">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI4" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv4">4</span></div></div>
+      <div class="hi"><div class="hlbl">Família</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="4" id="hA5" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv5">4</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="5" id="hI5" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv5">5</span></div></div>
+    </div>
+    <div style="display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--muted)">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--vm);margin-right:5px;vertical-align:middle"></span>Atual</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--em);margin-right:5px;vertical-align:middle"></span>Ideal</span>
+    </div>
+    <div class="cw" style="height:270px;margin-top:18px">
+      <canvas id="hchart" role="img" aria-label="Hexagrama bem-estar">Hexagrama.</canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 7 -->
+<div class="sec" id="t6">
+  <div class="hero"><div class="hero-lbl">Etapa 07</div><div class="hero-ttl">Relatório <b>Final</b></div></div>
+  <div class="card">
+    <div class="ctit">Prévia para Envio ao Aluno</div>
+    <div id="rPrv"></div>
+    <div class="brow">
+      <button class="btn bp" onclick="bldR()">Atualizar Prévia</button>
+      <button class="btn bo" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Ctrl+P → Salvar como PDF → enviar ao aluno</div>
+</div>
+
+</div>
+<script>
+const S={es:[],dc:null,hc:null};
+const TB=document.querySelectorAll('.tab');
+const SC=document.querySelectorAll('.sec');
+
+function gT(i){
+  TB.forEach((t,x)=>t.classList.toggle('active',x===i));
+  SC.forEach((s,x)=>s.classList.toggle('on',x===i));
+  if(i===3)setTimeout(iDC,80);
+  if(i===5)setTimeout(iHC,80);
+  if(i===6)bldR();
+}
+
+async function upld(e){
+  const f=e.target.files[0];if(!f)return;
+  const uz=document.getElementById('uz'),st=document.getElementById('ust');
+  st.style.display='block';
+  st.innerHTML=`<div class="sb"><div class="sd"></div>Lendo: <strong>${f.name}</strong><div class="lb"><div class="lf"></div></div></div>`;
+  uz.querySelector('.uz-ttl').textContent='✅ '+f.name;
+  const b64=await new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result.split(',')[1]);rd.onerror=j;rd.readAsDataURL(f)});
+  const isI=f.type.startsWith('image/'),mt=isI?f.type:'application/pdf';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
+      {type:isI?'image':'document',source:{type:'base64',media_type:mt,data:b64}},
+      {type:'text',text:'Extraia dados deste formulário de anamnese em JSON puro sem markdown. Se ausente use null:\n{"nome":"","idade":null,"peso":null,"altura":null,"cintura":null,"pas":null,"colesterol":null,"hdl":null,"sexo":"","diabetes":"","tabagismo":"","antihiper":"","historico_dcv":"","hist_dm":0,"nivel_af":"","objetivo":"","condicoes":"","medicamentos":""}'}
+    ]}]})});
+    const data=await res.json();
+    const txt=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'';
+    try{
+      const p=JSON.parse(txt.replace(/```json|```/g,'').trim());
+      const sv=(id,v)=>{if(v!=null&&v!==''){const el=document.getElementById(id);if(el)el.value=v;}};
+      sv('fn',p.nome);sv('fi2',p.idade);sv('fp',p.peso);sv('fh',p.altura);
+      sv('fci',p.cintura);sv('fpas',p.pas);sv('fcol',p.colesterol);sv('fhdl',p.hdl);
+      sv('fobj',p.objetivo);sv('fcon',p.condicoes);sv('fmed',p.medicamentos);
+      if(p.sexo){const s=document.getElementById('fs');[...s.options].forEach(o=>{if(o.value===p.sexo)s.value=p.sexo});}
+      cIMC();
+      st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>✅ Dados extraídos com sucesso. Revise e complete se necessário.</div>`;
+    }catch{st.innerHTML=`<div class="sb" style="border-color:rgba(212,130,42,.4);background:rgba(212,130,42,.1);color:var(--ljc)"><div class="sd" style="background:var(--lj);animation:none"></div>⚠ Arquivo lido. Preencha os campos manualmente.</div>`;}
+  }catch{st.innerHTML=`<div class="sb" style="border-color:rgba(212,80,80,.4);background:rgba(212,80,80,.1);color:var(--vmc)"><div class="sd" style="background:var(--vm);animation:none"></div>Erro na leitura. Preencha manualmente.</div>`;}
+}
+
+function cIMC(){
+  const p=parseFloat(document.getElementById('fp').value);
+  const h=parseFloat(document.getElementById('fh').value)/100;
+  if(p&&h)document.getElementById('fimc').value=(p/(h*h)).toFixed(1)+' kg/m²';
+}
+
+function gD(){
+  return{
+    nome:document.getElementById('fn').value,
+    sexo:document.getElementById('fs').value,
+    idade:document.getElementById('fi2').value,
+    imc:document.getElementById('fimc').value,
+    peso:document.getElementById('fp').value,
+    cintura:document.getElementById('fci').value,
+    pas:document.getElementById('fpas').value,
+    col:document.getElementById('fcol').value,
+    hdl:document.getElementById('fhdl').value,
+    db:document.getElementById('fdb').value,
+    tab:document.getElementById('ftab').value,
+    ah:document.getElementById('fah').value,
+    hd:document.getElementById('fhd').value,
+    hdm:document.getElementById('fhdm').value,
+    af:document.getElementById('faf').value,
+    obj:document.getElementById('fobj').value,
+    con:document.getElementById('fcon').value,
+    med:document.getElementById('fmed').value,
+    obs:document.getElementById('fobs').value,
+    D:+document.getElementById('slD').value,
+    I:+document.getElementById('slI').value,
+    Sv:+document.getElementById('slS').value,
+    C:+document.getElementById('slC').value
+  };
+}
+
+async function anIA(){
+  const d=gD();
+  const stEl=document.getElementById('iast'),outEl=document.getElementById('iaout'),btn=document.getElementById('bnia');
+  btn.disabled=true;btn.textContent='Analisando...';
+  stEl.style.display='block';
+  stEl.innerHTML=`<div class="sb"><div class="sd"></div>Gerando análise clínica contextual...<div class="lb"><div class="lf"></div></div></div>`;
+  const pr=`Você é Joyce Neres, Profissional de Educação Física especialista em prescrição de exercício. Analise o caso abaixo e produza parecer técnico objetivo em português estruturado em:\n1. FACILITADORES observados\n2. BARREIRAS e dificuldades\n3. NECESSIDADES identificadas\n4. BASE DO ACOMPANHAMENTO (ressignificação, ajustes FITTVP, observações sobre medicamentos se houver)\nSeja técnico, direto e orientado à prática. Máximo 380 palavras.\n\nNome: ${d.nome||'NI'} | Sexo: ${d.sexo||'NI'} | Idade: ${d.idade||'NI'} anos | IMC: ${d.imc||'NI'}\nObjetivo: ${d.obj||'NI'} | AF: ${d.af} | Diabetes: ${d.db} | Tabagismo: ${d.tab}\nAnti-hipertensivo: ${d.ah} | PA: ${d.pas||'NI'} | Colesterol: ${d.col||'NI'} | HDL: ${d.hdl||'NI'}\nHistórico DCV: ${d.hd} | Condições: ${d.con||'nenhuma'} | Medicamentos: ${d.med||'nenhum'}\nObservações: ${d.obs||'nenhuma'}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:pr}]})});
+    const data=await res.json();
+    const txt=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'Erro.';
+    document.getElementById('iate').value=txt;
+    outEl.style.display='block';stEl.style.display='none';
+  }catch{stEl.innerHTML=`<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)">Erro de conexão com a IA.</div>`;}
+  btn.disabled=false;btn.textContent='Gerar Análise Clínica com IA';
+}
+function cpIA(){navigator.clipboard.writeText(document.getElementById('iate').value).then(()=>alert('Copiado!'));}
+
+function cFRS(){
+  const d=gD();const el=document.getElementById('rFRS');
+  const f=[],n=[];
+  const i=+d.idade||0;
+  if(d.sexo==='M'&&i>=45)f.push('Homem ≥45 anos');
+  if(d.sexo==='F'&&i>=55)f.push('Mulher ≥55 anos');
+  if(d.hd==='sim')f.push('Histórico familiar DCV');
+  if(d.tab==='sim')f.push('Tabagismo ativo');
+  if(d.tab==='ex')f.push('Ex-fumante &lt;6 meses');
+  if(d.db==='sim'||d.db==='pre')f.push('Diabetes / Pré-diabetes');
+  const pas=+d.pas||0;if(pas>=130)f.push('PA ≥130 mmHg ou tratada');
+  const hdl=+d.hdl||0;
+  if(hdl<40&&d.sexo==='M')f.push('HDL &lt;40 mg/dL (♂)');
+  if(hdl<50&&d.sexo==='F')f.push('HDL &lt;50 mg/dL (♀)');
+  const col=+d.col||0;if(col>200)f.push('Colesterol &gt;200 mg/dL');
+  const imc=parseFloat(d.imc)||0;if(imc>=30)f.push('IMC ≥30 kg/m²');
+  if(hdl>60)n.push('HDL &gt;60 mg/dL (protetor cardiovascular)');
+  const tot=f.length-(n.length?1:0);
+  const[r,c]=tot<=1?['Baixo','rb-b']:tot<=2?['Moderado','rb-m']:['Alto','rb-a'];
+  el.innerHTML=`<div style="margin-bottom:12px"><span class="rb ${c}">Risco ${r}</span><span style="font-size:11.5px;color:var(--muted);margin-left:10px">${tot} fator(es)</span></div><div style="margin-bottom:10px">${f.map(x=>`<span class="tag tr">${x}</span>`).join('')}${n.map(x=>`<span class="tag tg">${x}</span>`).join('')}</div><div class="aib" style="font-size:12.5px"><strong>Análise ACSM:</strong> ${tot===0?'Risco muito baixo. Clearance para exercício sem restrições adicionais.':tot<=2?'Risco moderado. Monitorar fatores identificados. Progressão cautelosa e supervisão recomendada.':'Risco elevado. Avaliação médica recomendada antes de exercício de alta intensidade (ACSM Cat. II–III).'}</div>`;
+}
+
+function cFDR(){
+  const d=gD();const el=document.getElementById('rFDR');
+  let pts=0;
+  const i=+d.idade||0;if(i>=45&&i<=54)pts+=2;else if(i>=55&&i<=64)pts+=3;else if(i>=65)pts+=4;
+  const imc=parseFloat(d.imc)||0;if(imc>=25&&imc<30)pts+=1;else if(imc>=30)pts+=3;
+  const cin=+d.cintura||0;
+  if(d.sexo==='M'){if(cin>=94&&cin<102)pts+=3;else if(cin>=102)pts+=4;}
+  else{if(cin>=80&&cin<88)pts+=3;else if(cin>=88)pts+=4;}
+  if(d.af==='sedentario')pts+=2;
+  pts+=+d.hdm||0;
+  if(d.ah==='sim')pts+=2;
+  if(d.db==='pre')pts+=5;
+  let r,c;
+  if(pts<=6){r='Baixo — 1 em 100';c='rb-b';}
+  else if(pts<=11){r='Intermediário — 1 em 25';c='rb-m';}
+  else if(pts<=14){r='Moderado — 1 em 6';c='rb-m';}
+  else if(pts<=20){r='Alto — 1 em 3';c='rb-a';}
+  else{r='Muito Alto — 1 em 2';c='rb-a';}
+  el.innerHTML=`<div style="margin-bottom:10px"><span class="rb ${c}">FINDRISC: ${r}</span><span style="font-size:11.5px;color:var(--muted);margin-left:10px">Score: ${pts} pts</span></div><div class="aib" style="font-size:12.5px;margin-top:8px">${pts>=8?'Risco intermediário ou maior. Exercício aeróbico regular é fator protetor prioritário. Monitoramento glicêmico e orientação nutricional recomendados.':'Risco baixo. Manter estilo de vida ativo como estratégia preventiva.'}</div>`;
+}
+
+function cACSM(){
+  const d=gD();const el=document.getElementById('rACSM');
+  const pos=[],neg=[];
+  const i=+d.idade||0;
+  if(d.sexo==='M'&&i>=45)pos.push('Idade ≥45 anos (♂)');
+  if(d.sexo==='F'&&i>=55)pos.push('Idade ≥55 anos (♀)');
+  if(d.hd==='sim')pos.push('Histórico familiar DCV');
+  if(d.tab==='sim')pos.push('Tabagismo atual');
+  if(d.af==='sedentario')pos.push('Sedentarismo');
+  const imc=parseFloat(d.imc)||0;if(imc>=30)pos.push('Obesidade IMC ≥30');
+  const pas=+d.pas||0;if(pas>=130)pos.push('Hipertensão / tratamento');
+  const hdl=+d.hdl||0,col=+d.col||0;
+  if(hdl<40||col>200)pos.push('Dislipidemia');
+  if(d.db==='sim')pos.push('Diabetes tipo 2');
+  if(hdl>60)neg.push('HDL &gt;60 mg/dL (protetor)');
+  const tot=pos.length-(neg.length?1:0);
+  const[nv,c]=tot<=1?['Baixo Risco','rb-b']:tot<=2?['Risco Moderado','rb-m']:['Alto Risco','rb-a'];
+  el.innerHTML=`<div style="margin-bottom:12px"><span class="rb ${c}">${nv} ACSM — ${tot} fator(es)</span></div><div style="display:flex;gap:16px;flex-wrap:wrap"><div style="flex:1;min-width:170px"><div style="font-size:10px;font-weight:600;color:var(--vmc);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Fatores Positivos</div>${pos.length?pos.map(x=>`<span class="tag tr">${x}</span>`).join(''):'<span style="font-size:12px;color:var(--muted)">Nenhum</span>'}</div><div style="flex:1;min-width:170px"><div style="font-size:10px;font-weight:600;color:var(--em-c);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Fatores Protetores</div>${neg.length?neg.map(x=>`<span class="tag tg">${x}</span>`).join(''):'<span style="font-size:12px;color:var(--muted)">Nenhum</span>'}</div></div>`;
+}
+
+function upD(){
+  const vD=+document.getElementById('slD').value,vI=+document.getElementById('slI').value,vS=+document.getElementById('slS').value,vC=+document.getElementById('slC').value;
+  document.getElementById('vD').textContent=vD;
+  document.getElementById('vI').textContent=vI;
+  document.getElementById('vS').textContent=vS;
+  document.getElementById('vC').textContent=vC;
+  if(S.dc){S.dc.data.datasets[0].data=[vD,vI,vS,vC];S.dc.update();}
+  const mx=Math.max(vD,vI,vS,vC);
+  const PF=[
+    {v:vD,n:'Diretivo (Vermelho)',c:'var(--vmc)',est:['Comunicação direta e objetiva — sem rodeios','Apresente metas mensuráveis e resultados concretos','Respeite sua autonomia e independência','Mostre progressos com dados e números']},
+    {v:vI,n:'Influenciador (Laranja)',c:'var(--ljc)',est:['Use linguagem positiva, entusiasmada e motivadora','Varie os treinos para manter engajamento','Celebre conquistas e reconheça cada avanço','Envolva em desafios, metas divertidas e contexto social']},
+    {v:vS,n:'Estável (Verde)',c:'var(--em-c)',est:['Construa confiança antes de aumentar exigências','Progressão gradual sem pressão ou comparações','Momentos de escuta ativa e conexão pessoal','Foco em bem-estar e qualidade de vida']},
+    {v:vC,n:'Cauteloso (Azul)',c:'var(--azc)',est:['Apresente embasamento científico de cada prescrição','Explique o "por quê" de cada exercício','Planejamentos detalhados com métricas claras','Responda dúvidas técnicas com precisão']}
+  ];
+  const dom=PF.find(p=>p.v===mx);
+  const aEl=document.getElementById('dAnal'),eEl=document.getElementById('dEst'),eTxt=document.getElementById('dEstT');
+  if(dom){
+    aEl.innerHTML=`<div class="pcs"><div class="pc pcv" style="${mx===vD?'box-shadow:0 0 0 1.5px var(--vm)':''}"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${vD}<span style="font-size:12px">/10</span></div></div><div class="pc pco" style="${mx===vI?'box-shadow:0 0 0 1.5px var(--lj)':''}"><div class="pcn" style="color:var(--ljc)">Influenciador</div><div class="pcs_" style="color:var(--ljc)">${vI}<span style="font-size:12px">/10</span></div></div><div class="pc pcg" style="${mx===vS?'box-shadow:0 0 0 1.5px var(--em)':''}"><div class="pcn" style="color:var(--em-c)">Estável</div><div class="pcs_" style="color:var(--em-c)">${vS}<span style="font-size:12px">/10</span></div></div><div class="pc pca" style="${mx===vC?'box-shadow:0 0 0 1.5px var(--az)':''}"><div class="pcn" style="color:var(--azc)">Cauteloso</div><div class="pcs_" style="color:var(--azc)">${vC}<span style="font-size:12px">/10</span></div></div></div><div class="aib"><strong style="color:${dom.c}">Perfil dominante: ${dom.n}</strong></div>`;
+    eEl.style.display='block';
+    eTxt.innerHTML=`<ul style="padding-left:18px;font-size:13px;line-height:2.1">${dom.est.map(e=>`<li>${e}</li>`).join('')}</ul>`;
+  }
+}
+
+function iDC(){
+  if(S.dc)return;
+  const ctx=document.getElementById('dchart').getContext('2d');
+  S.dc=new Chart(ctx,{type:'radar',data:{labels:['Diretivo\n(Vermelho)','Influenciador\n(Laranja)','Estável\n(Verde)','Cauteloso\n(Azul)'],datasets:[{data:[5,5,5,5],backgroundColor:'rgba(77,158,114,0.13)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:['#d45050','#d4822a','#4d9e72','#5a9fd4'],pointRadius:5,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:9.5},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10.5},color:'rgba(255,255,255,0.6)'}}}}});
+  upD();
+}
+
+function upH(){
+  const a=[],id=[];
+  for(let i=0;i<6;i++){
+    const av=+document.getElementById(`hA${i}`).value,iv=+document.getElementById(`hI${i}`).value;
+    a.push(av);id.push(iv);
+    document.getElementById(`hAv${i}`).textContent=av;document.getElementById(`hIv${i}`).textContent=iv;
+  }
+  if(S.hc){S.hc.data.datasets[0].data=a;S.hc.data.datasets[1].data=id;S.hc.update();}
+}
+
+function iHC(){
+  if(S.hc)return;
+  const ctx=document.getElementById('hchart').getContext('2d');
+  S.hc=new Chart(ctx,{type:'radar',data:{labels:['Saúde e\nAutocuidado','Atividade\nFísica','Alimentação','Trabalho e\nEducação','Lazer /\nSocial','Família'],datasets:[{label:'Atual',data:[2,2,3,3,2,4],backgroundColor:'rgba(212,80,80,0.11)',borderColor:'#d45050',borderWidth:1.5,pointBackgroundColor:'#d45050',pointRadius:4},{label:'Ideal',data:[4,5,4,4,4,5],backgroundColor:'rgba(77,158,114,0.11)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:'#4d9e72',pointRadius:4,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:5,ticks:{stepSize:1,font:{size:9.5},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10.5},color:'rgba(255,255,255,0.6)'}}}}});
+  upH();
+}
+
+function tgE(el,id){
+  el.classList.toggle('sel');
+  const x=S.es.indexOf(id);if(x>=0)S.es.splice(x,1);else S.es.push(id);
+}
+
+function bldR(){
+  const d=gD();
+  const EM={manutencao:'Manutenção',acao:'Ação',preparacao:'Preparação',contemplacao:'Contemplação',precontemplacao:'Pré-contemplação'};
+  const mx=Math.max(d.D,d.I,d.Sv,d.C);
+  const dn=mx===d.D?'Diretivo (Vermelho)':mx===d.I?'Influenciador (Laranja)':mx===d.Sv?'Estável (Verde)':'Cauteloso (Azul)';
+  const mot=document.getElementById('fmot').value;
+  const ia=document.getElementById('iate')?.value||'';
+  document.getElementById('rPrv').innerHTML=`
+<div style="background:var(--carvao);border:1px solid var(--em-b);border-radius:14px;padding:24px 28px;margin-bottom:20px;text-align:center">
+  <div style="font-size:10px;color:var(--em);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:600">Profª Joyce Neres · Educação Física</div>
+  <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--creme);line-height:1.2">Relatório de <strong style="font-style:normal;color:var(--em-c)">Consulta</strong></div>
+  <div style="font-size:11px;color:var(--muted);margin-top:7px">Atividade Física, Exercício e Saúde</div>
+</div>
+<div class="mg">
+  <div class="met"><div class="mlbl">Aluno(a)</div><div class="mvl mve" style="font-size:12.5px">${d.nome||'—'}</div></div>
+  <div class="met"><div class="mlbl">Data</div><div class="mvl">${new Date().toLocaleDateString('pt-BR')}</div></div>
+  <div class="met"><div class="mlbl">IMC</div><div class="mvl">${d.imc||'—'}</div></div>
+</div>
+<div style="margin-bottom:15px"><div class="ctit">Objetivo</div><p style="font-size:13px">${d.obj||'Não informado'}</p></div>
+${ia?`<div style="margin-bottom:15px"><div class="ctit">Análise Clínica Contextual</div><div class="aib">${ia}</div></div>`:''}
+<div style="margin-bottom:15px"><div class="ctit">Perfil Comportamental DISC / LASEr</div>
+<div class="pcs"><div class="pc pcv"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${d.D}<span style="font-size:11px">/10</span></div></div><div class="pc pco"><div class="pcn" style="color:var(--ljc)">Influenciador</div><div class="pcs_" style="color:var(--ljc)">${d.I}<span style="font-size:11px">/10</span></div></div><div class="pc pcg"><div class="pcn" style="color:var(--em-c)">Estável</div><div class="pcs_" style="color:var(--em-c)">${d.Sv}<span style="font-size:11px">/10</span></div></div><div class="pc pca"><div class="pcn" style="color:var(--azc)">Cauteloso</div><div class="pcs_" style="color:var(--azc)">${d.C}<span style="font-size:11px">/10</span></div></div></div>
+<p style="font-size:12.5px;margin-top:8px"><strong style="color:var(--creme)">Perfil dominante:</strong> <span style="color:var(--em-c)">${dn}</span></p></div>
+<div style="margin-bottom:15px"><div class="ctit">Estágio Motivacional</div><div>${S.es.length?S.es.map(e=>`<span class="tag tg">${EM[e]}</span>`).join(' '):'<span style="font-size:12px;color:var(--muted)">Não avaliado</span>'}</div>${mot?`<div class="aib" style="margin-top:10px;font-size:12.5px">${mot}</div>`:''}</div>
+<div style="margin-bottom:15px"><div class="ctit">Condições e Medicamentos</div><p style="font-size:13px">${d.con||'Nenhuma condição informada'}</p>${d.med?`<p style="font-size:12px;color:var(--muted);margin-top:4px"><strong>Medicamentos:</strong> ${d.med}</p>`:''}</div>
+<div style="margin-top:24px;padding:13px 17px;border:1px solid var(--borda);border-radius:var(--r);text-align:center;font-size:11px;color:var(--muted)">
+  Documento gerado pelo Sistema JN Consultoria de Treino · Profª Joyce Neres — CREF ___<br>Uso profissional e pessoal do(a) aluno(a).
+</div>`;
+}
+</script>
+</body>
+</html>
