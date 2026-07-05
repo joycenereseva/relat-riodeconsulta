@@ -242,9 +242,14 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 <div class="sec on" id="t0">
 <div class="hero"><div class="hero-lbl">Etapa 01</div><div class="hero-ttl">Dados do <b>Aluno</b></div></div>
 <div class="card">
-  <div class="ctit">Upload da Anamnese (PDF)</div>
-  <div class="uz" id="uz"><input type="file" id="fi" accept=".pdf" onchange="upld(event)"><div class="uz-ico">&#128196;</div><div class="uz-ttl">Solte o PDF aqui ou clique</div><div class="uz-sub">Apenas PDF &#183; Leitura local via pdf.js &#183; Dados extraídos automaticamente</div></div>
-  <div id="ust" style="display:none;margin-top:10px"></div>
+  <div class="ctit">Preencher Automaticamente</div>
+  <div class="csub">Cole o texto estruturado da anamnese abaixo e clique em preencher. Os dados serão distribuídos em todos os campos do sistema automaticamente.</div>
+  <textarea id="txtColar" style="min-height:140px;font-size:12px;font-family:monospace;letter-spacing:.2px" placeholder="NOME: Vitória Cardoso&#10;SEXO: F&#10;IDADE: 27&#10;PESO: 73&#10;ALTURA: 167&#10;OBJETIVO: Emagrecimento sem perda de massa muscular&#10;NIVEL_TREINO: intermediario&#10;DIABETES: nao&#10;TABAGISMO: nao&#10;ANTIHIPERTENSIVO: nao&#10;HISTORICO_DCV: nao&#10;HISTORICO_DM: 3&#10;ATIVIDADE_FISICA: moderado&#10;CONDICOES: Nenhuma&#10;MEDICAMENTOS: Não&#10;OBSERVACOES: Pratica musculação, dorme mal...&#10;DISC_D: 7&#10;DISC_I: 4&#10;DISC_S: 5&#10;DISC_C: 6&#10;ESTAGIO: preparacao&#10;BEM_ESTAR_SAUDE: 2/4&#10;BEM_ESTAR_AF: 3/5&#10;BEM_ESTAR_ALIMENTACAO: 3/4&#10;BEM_ESTAR_TRABALHO: 2/4&#10;BEM_ESTAR_LAZER: 2/4&#10;BEM_ESTAR_FAMILIA: 4/5"></textarea>
+  <div class="brow" style="margin-top:10px">
+    <button class="btn bp" onclick="preencherAuto()">&#9889; Preencher Automaticamente</button>
+    <button class="btn bg" onclick="document.getElementById('txtColar').value=''">Limpar</button>
+  </div>
+  <div id="autoSt" style="display:none;margin-top:10px"></div>
 </div>
 <div class="card">
   <div class="ctit">Dados Gerais</div>
@@ -255,7 +260,6 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
     <div class="fgrp"><label>Peso (kg)</label><input type="number" id="fp" placeholder="65.0" step="0.1" oninput="cIMC()"></div>
     <div class="fgrp"><label>Altura (cm)</label><input type="number" id="fh" placeholder="165" oninput="cIMC()"></div>
     <div class="fgrp"><label>IMC</label><input type="text" id="fimc" readonly placeholder="Automático"></div>
-    <div class="fgrp"><label>% Gordura corporal</label><input type="number" id="fgord" placeholder="Ex: 22" step="0.1"></div>
     <div class="fgrp"><label>Cintura (cm)</label><input type="number" id="fci" placeholder="Opcional"></div>
     <div class="fgrp"><label>PA sistólica (mmHg)</label><input type="number" id="fpas" placeholder="Ex: 120"></div>
     <div class="fgrp"><label>Colesterol total (mg/dL)</label><input type="number" id="fcol" placeholder="Ex: 180"></div>
@@ -378,6 +382,18 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
     <div class="fgrp full"><label>Pontos Fortes</label><textarea id="fPF" style="min-height:70px" placeholder="Ex: Boa base de força, ombros simétricos..."></textarea></div>
     <div class="fgrp full"><label>Pontos de Melhoria</label><textarea id="fPM" style="min-height:70px" placeholder="Ex: Volume posterior de coxa, mobilidade de quadril..."></textarea></div>
   </div>
+</div>
+
+<!-- PREENCHER PLANO AUTO -->
+<div class="card">
+  <div class="ctit">Preencher Plano Automaticamente</div>
+  <div class="csub">Cole o texto com os dados do plano. Preenche FITTVP e SMART de uma vez.</div>
+  <textarea id="txtColarPlano" style="min-height:120px;font-size:12px;font-family:monospace;letter-spacing:.2px" placeholder="FITTVP_FREQ: 4x por semana&#10;FITTVP_INT: 70-80% 1RM (RPE 7-8)&#10;FITTVP_TIPO: Musculação + cardio leve&#10;FITTVP_TEMPO: 1h30 por sessão&#10;FITTVP_VOL: 16-20 séries/grupo/semana&#10;FITTVP_PROG: +2,5% carga/semana&#10;FITTVP_AFETO: Prefere variedade, música animada&#10;FITTVP_OBS: Evitar impacto em joelho&#10;SMART_S: Meta específica...&#10;SMART_M: Como medir...&#10;SMART_A: É alcançável porque...&#10;SMART_R: Relevante pois...&#10;SMART_T: Prazo de 12 semanas"></textarea>
+  <div class="brow" style="margin-top:10px">
+    <button class="btn bp" onclick="preencherAutoPlano()">&#9889; Preencher Plano</button>
+    <button class="btn bg" onclick="document.getElementById('txtColarPlano').value=''">Limpar</button>
+  </div>
+  <div id="autoPlanoSt" style="display:none;margin-top:10px"></div>
 </div>
 
 <!-- FITTVP-AFFECT -->
@@ -1099,6 +1115,118 @@ ${parecer?`<div class="R-sec">
 </div>
 
 </div>`;
+}
+
+// ===== PREENCHER AUTOMATICAMENTE — Aba 1 (Anamnese + DISC + Motivacional + Bem-Estar) =====
+function preencherAuto(){
+  const txt = document.getElementById('txtColar').value.trim();
+  const st = document.getElementById('autoSt');
+  if(!txt){ st.style.display='block'; st.innerHTML='<div class="sb" style="border-color:rgba(212,130,42,.4);color:var(--ljc)">Cole o texto antes de preencher.</div>'; return; }
+
+  // Extrator: lê LABEL: valor (case-insensitive, ignora espaços)
+  function get(key){
+    const re = new RegExp('^'+key+'\\s*:\\s*(.+)$','im');
+    const m = txt.match(re);
+    return m ? m[1].trim() : null;
+  }
+  function sv(id,v){ if(v){ const el=document.getElementById(id); if(el) el.value=v; }}
+  function sel(id,v){ if(v){ const el=document.getElementById(id); if(el){ [...el.options].forEach(o=>{ if(o.value.toLowerCase()===v.toLowerCase()) el.value=o.value; }); }}}
+
+  let preenchidos = 0;
+
+  // ── DADOS PESSOAIS ──
+  const nome=get('NOME'); if(nome){sv('fn',nome);preenchidos++;}
+  const sexo=get('SEXO'); if(sexo){ const s=sexo.trim().toUpperCase(); sv('fs',s==='F'||s==='FEMININO'?'F':'M'); preenchidos++; }
+  const idade=get('IDADE'); if(idade){sv('fi2',idade);preenchidos++;}
+  const peso=get('PESO'); if(peso){sv('fp',peso.replace(',','.'));preenchidos++;}
+  const altura=get('ALTURA'); if(altura){ let h=parseFloat(altura.replace(',','.')); if(h<3)h*=100; sv('fh',String(h)); preenchidos++; }
+  const cintura=get('CINTURA'); if(cintura){sv('fci',cintura);}
+  const pas=get('PA'); if(pas){sv('fpas',pas);}
+  const hdl=get('HDL'); if(hdl){sv('fhdl',hdl);}
+  const col=get('COLESTEROL'); if(col){sv('fcol',col);}
+
+  // ── SELEÇÕES ──
+  const niv=get('NIVEL_TREINO'); if(niv){sel('fniv',niv);preenchidos++;}
+  const db=get('DIABETES'); if(db){sel('fdb',db);}
+  const tab=get('TABAGISMO'); if(tab){sel('ftab',tab);}
+  const ah=get('ANTIHIPERTENSIVO'); if(ah){sel('fah',ah);}
+  const dcv=get('HISTORICO_DCV'); if(dcv){sel('fhd',dcv);}
+  const af=get('ATIVIDADE_FISICA'); if(af){sel('faf',af);preenchidos++;}
+  const hdm=get('HISTORICO_DM'); if(hdm){ const el=document.getElementById('fhdm'); if(el){ [...el.options].forEach(o=>{ if(o.value===hdm) el.value=hdm; }); }}
+
+  // ── TEXTOS ──
+  const obj=get('OBJETIVO'); if(obj){sv('fobj',obj);preenchidos++;}
+  const con=get('CONDICOES'); if(con && !/^não$/i.test(con)){sv('fcon',con);}
+  const med=get('MEDICAMENTOS'); if(med && !/^não$/i.test(med)){sv('fmed',med);}
+  const obs=get('OBSERVACOES'); if(obs){sv('fobs',obs);}
+
+  cIMC();
+
+  // ── DISC ──
+  const dD=get('DISC_D'), dI=get('DISC_I'), dS=get('DISC_S'), dC=get('DISC_C');
+  if(dD||dI||dS||dC){
+    if(dD){const el=document.getElementById('slD');if(el){el.value=dD;document.getElementById('vD').textContent=dD;}}
+    if(dI){const el=document.getElementById('slI');if(el){el.value=dI;document.getElementById('vI').textContent=dI;}}
+    if(dS){const el=document.getElementById('slS');if(el){el.value=dS;document.getElementById('vS').textContent=dS;}}
+    if(dC){const el=document.getElementById('slC');if(el){el.value=dC;document.getElementById('vC').textContent=dC;}}
+    if(S.dc){S.dc.data.datasets[0].data=[+(dD||5),+(dI||5),+(dS||5),+(dC||5)];S.dc.update();}
+    preenchidos++;
+  }
+
+  // ── ESTÁGIO MOTIVACIONAL ──
+  const est=get('ESTAGIO');
+  if(est){
+    const mapa={manutencao:'manutencao',manutenção:'manutencao',acao:'acao','ação':'acao',preparacao:'preparacao','preparação':'preparacao',contemplacao:'contemplacao','contemplação':'contemplacao',precontemplacao:'precontemplacao','pré-contemplação':'precontemplacao'};
+    const chave=mapa[est.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')];
+    if(chave && !S.es.includes(chave)){
+      S.es.push(chave);
+      document.querySelectorAll('.ei').forEach(el=>{
+        if(el.getAttribute('onclick')?.includes(chave)) el.classList.add('sel');
+      });
+      preenchidos++;
+    }
+  }
+
+  // ── BEM-ESTAR ──
+  const bemLabels=['SAUDE','AF','ALIMENTACAO','TRABALHO','LAZER','FAMILIA'];
+  const bemIds=[0,1,2,3,4,5];
+  let bemPreenchido=false;
+  bemLabels.forEach((lbl,i)=>{
+    const val=get('BEM_ESTAR_'+lbl);
+    if(val){
+      const partes=val.split('/');
+      const atual=partes[0]?.trim(), ideal=partes[1]?.trim();
+      if(atual){ const el=document.getElementById('hA'+i); if(el){el.value=atual; document.getElementById('hAv'+i).textContent=atual;} }
+      if(ideal){ const el=document.getElementById('hI'+i); if(el){el.value=ideal; document.getElementById('hIv'+i).textContent=ideal;} }
+      bemPreenchido=true;
+    }
+  });
+  if(bemPreenchido){ if(S.hc){ const a=[],id=[]; for(let i=0;i<6;i++){a.push(+document.getElementById('hA'+i).value);id.push(+document.getElementById('hI'+i).value);} S.hc.data.datasets[0].data=a;S.hc.data.datasets[1].data=id;S.hc.update(); } preenchidos++; }
+
+  st.style.display='block';
+  st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>\u2705 ${preenchidos} grupos preenchidos com sucesso. Revise e ajuste os campos necessários antes de avançar.</div>`;
+}
+
+// ===== PREENCHER AUTOMATICAMENTE — Aba 7 (FITTVP + SMART) =====
+function preencherAutoPlano(){
+  const txt = document.getElementById('txtColarPlano').value.trim();
+  const st = document.getElementById('autoPlanoSt');
+  if(!txt){ st.style.display='block'; st.innerHTML='<div class="sb" style="border-color:rgba(212,130,42,.4);color:var(--ljc)">Cole o texto antes de preencher.</div>'; return; }
+
+  function get(key){ const re=new RegExp('^'+key+'\\s*:\\s*(.+)$','im'); const m=txt.match(re); return m?m[1].trim():null; }
+  function sv(id,v){ if(v){ const el=document.getElementById(id); if(el) el.value=v; }}
+
+  let preenchidos=0;
+  const mapa={
+    FITTVP_FREQ:'ffFreq', FITTVP_INT:'ffInt', FITTVP_TIPO:'ffTipo',
+    FITTVP_TEMPO:'ffTempo', FITTVP_VOL:'ffVol', FITTVP_PROG:'ffProg',
+    FITTVP_AFETO:'ffAfeto', FITTVP_OBS:'ffObs',
+    SMART_S:'smS', SMART_M:'smM', SMART_A:'smA', SMART_R:'smR', SMART_T:'smT'
+  };
+  Object.entries(mapa).forEach(([key,id])=>{ const v=get(key); if(v){sv(id,v);preenchidos++;} });
+
+  st.style.display='block';
+  st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>\u2705 ${preenchidos} campos preenchidos. Edite o que precisar antes de gerar o relatório.</div>`;
 }
 </script>
 </body>
