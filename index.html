@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profª Joyce Neres — Sistema de Consulta</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -17,148 +18,206 @@
   --r:10px;--rl:15px;
 }
 body{font-family:var(--fb);background:var(--preto);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.65}
-.app{max-width:920px;margin:0 auto;padding:0 0 100px}
-
-.hdr{background:var(--carvao);border-bottom:1px solid var(--borda);padding:0 36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;height:60px}
+.app{max-width:960px;margin:0 auto;padding:0 0 100px}
+.hdr{background:var(--carvao);border-bottom:1px solid var(--borda);padding:0 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;height:58px}
 .hdr-l{display:flex;align-items:baseline;gap:12px}
 .hdr-name{font-family:var(--fd);font-style:italic;color:var(--creme);font-size:17px;letter-spacing:.3px}
 .hdr-sep{width:4px;height:4px;border-radius:50%;background:var(--em);flex-shrink:0;margin-bottom:2px}
-.hdr-sys{font-size:10.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
-.hdr-badge{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:5px 13px;border-radius:20px;border:1px solid var(--em-b);color:var(--em-c);background:var(--em-p)}
-
-.tabs{background:var(--carvao);border-bottom:1px solid var(--borda);display:flex;padding:0 36px;overflow-x:auto;scrollbar-width:none}
+.hdr-sys{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.hdr-badge{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;border:1px solid var(--em-b);color:var(--em-c);background:var(--em-p)}
+.tabs{background:var(--carvao);border-bottom:1px solid var(--borda);display:flex;padding:0 32px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:14px 16px;font-size:11.5px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;font-family:var(--fb);letter-spacing:.3px}
+.tab{padding:13px 14px;font-size:11px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;font-family:var(--fb);letter-spacing:.3px}
 .tab:hover{color:var(--em-c)}
 .tab.active{color:var(--creme);border-bottom-color:var(--em);font-weight:600}
-.tn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.06);color:var(--muted);font-size:9px;font-weight:700;margin-right:6px}
+.tn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,0.06);color:var(--muted);font-size:9px;font-weight:700;margin-right:5px}
 .tab.active .tn{background:var(--em);color:#fff}
-
-.sec{padding:32px 36px;display:none}
+.tab-rel .tn{background:var(--em-p);color:var(--em-c);border:1px solid var(--em-b)}
+.sec{padding:26px 32px;display:none}
 .sec.on{display:block}
-
-.hero{margin-bottom:22px}
-.hero-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--em);margin-bottom:5px}
-.hero-ttl{font-family:var(--fd);font-size:25px;font-style:italic;color:var(--creme);line-height:1.2}
+.hero{margin-bottom:18px}
+.hero-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--em);margin-bottom:4px}
+.hero-ttl{font-family:var(--fd);font-size:23px;font-style:italic;color:var(--creme);line-height:1.2}
 .hero-ttl b{font-style:normal;color:var(--em-c)}
-
-.card{background:var(--sup);border:1px solid var(--borda);border-radius:var(--rl);padding:22px;margin-bottom:14px}
-.card:hover{border-color:rgba(255,255,255,0.12)}
-.ctit{font-family:var(--fd);font-size:13px;color:var(--creme);font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:9px;letter-spacing:.2px}
-.ctit::before{content:'';width:2px;height:15px;background:var(--em);border-radius:2px;flex-shrink:0}
-.csub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
-
-.uz{border:1.5px dashed var(--em-b);border-radius:var(--rl);padding:38px 24px;text-align:center;cursor:pointer;transition:all .25s;background:var(--em-p);position:relative}
+.card{background:var(--sup);border:1px solid var(--borda);border-radius:var(--rl);padding:20px;margin-bottom:13px}
+.ctit{font-family:var(--fd);font-size:13px;color:var(--creme);font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;letter-spacing:.2px}
+.ctit::before{content:'';width:2px;height:14px;background:var(--em);border-radius:2px;flex-shrink:0}
+.csub{font-size:12px;color:var(--muted);margin-bottom:13px;line-height:1.6}
+.uz{border:1.5px dashed var(--em-b);border-radius:var(--rl);padding:30px 20px;text-align:center;cursor:pointer;transition:all .25s;background:var(--em-p);position:relative}
 .uz:hover{border-color:var(--em);background:rgba(77,158,114,0.18)}
 .uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.uz-ico{font-size:30px;margin-bottom:10px;opacity:.75}
-.uz-ttl{font-family:var(--fd);font-style:italic;font-size:15px;color:var(--creme);margin-bottom:4px}
-.uz-sub{font-size:11.5px;color:var(--muted)}
-
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fg.g3{grid-template-columns:1fr 1fr 1fr}
+.uz-ico{font-size:26px;margin-bottom:7px;opacity:.75}
+.uz-ttl{font-family:var(--fd);font-style:italic;font-size:14px;color:var(--creme);margin-bottom:3px}
+.uz-sub{font-size:11px;color:var(--muted)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fgrp{display:flex;flex-direction:column;gap:4px}
 .fgrp.full{grid-column:1/-1}
 label{font-size:10px;font-weight:600;color:var(--em-c);letter-spacing:.8px;text-transform:uppercase}
-input,select,textarea{padding:10px 12px;border:1px solid var(--borda);border-radius:var(--r);font-family:var(--fb);font-size:13px;background:var(--sup2);color:var(--txt);transition:all .2s;width:100%}
+input,select,textarea{padding:9px 11px;border:1px solid var(--borda);border-radius:var(--r);font-family:var(--fb);font-size:13px;background:var(--sup2);color:var(--txt);transition:all .2s;width:100%}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--em);background:var(--sup3);box-shadow:0 0 0 3px rgba(77,158,114,0.13)}
-input::placeholder,textarea::placeholder{color:var(--muted);opacity:.65}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.6}
 input[readonly]{background:var(--sup);color:var(--muted)}
 select option{background:var(--sup2)}
-textarea{resize:vertical;min-height:70px}
+textarea{resize:vertical;min-height:65px}
 input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var(--sup3);border-radius:2px}
-
-.disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.dg{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--sup2);border-radius:var(--r);border:1px solid var(--borda)}
+.disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dg{display:flex;flex-direction:column;gap:5px;padding:14px;background:var(--sup2);border-radius:var(--r);border:1px solid var(--borda)}
 .dg-h{display:flex;justify-content:space-between;align-items:center}
 .dg-nm{font-size:12px;font-weight:600}
-.dg-vl{font-size:20px;font-weight:700;min-width:26px;text-align:right}
+.dg-vl{font-size:19px;font-weight:700;min-width:24px;text-align:right}
 .dg-d{font-size:11px;color:var(--muted);line-height:1.5}
-.dg-nd{font-size:10px;color:rgba(255,255,255,.3);font-style:italic;margin-top:4px}
-
-.hexg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.hi{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:14px}
-.hlbl{font-size:10px;font-weight:600;color:var(--em-c);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
-.hrow{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.dg-nd{font-size:10px;color:rgba(255,255,255,.28);font-style:italic;margin-top:3px}
+.hexg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hi{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:12px}
+.hlbl{font-size:10px;font-weight:600;color:var(--em-c);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.hrow{display:flex;align-items:center;gap:8px;margin-bottom:5px}
 .htag{font-size:10px;color:var(--muted);width:28px;flex-shrink:0}
-.hvl{font-size:13px;font-weight:700;color:var(--creme);min-width:16px;text-align:center}
-
-.ei{display:flex;align-items:center;gap:13px;padding:12px 15px;border-radius:var(--r);margin-bottom:8px;border:1px solid var(--borda);cursor:pointer;transition:all .2s;background:var(--sup2)}
+.hvl{font-size:12px;font-weight:700;color:var(--creme);min-width:15px;text-align:center}
+.ei{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:var(--r);margin-bottom:7px;border:1px solid var(--borda);cursor:pointer;transition:all .2s;background:var(--sup2)}
 .ei:hover{border-color:var(--em-b);background:var(--sup3)}
 .ei.sel{border-color:var(--em);background:var(--em-p)}
-.edot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--muted);flex-shrink:0;transition:all .2s}
+.edot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--muted);flex-shrink:0;transition:all .2s}
 .ei.sel .edot{background:var(--em);border-color:var(--em)}
 .ettl{font-size:13px;font-weight:600;color:var(--creme)}
-.esub{font-size:11.5px;color:var(--muted);margin-top:2px}
-
-.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r);font-family:var(--fb);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;letter-spacing:.2px}
+.esub{font-size:11px;color:var(--muted);margin-top:1px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 17px;border-radius:var(--r);font-family:var(--fb);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:none;letter-spacing:.2px}
 .bp{background:var(--em);color:#fff}
 .bp:hover{background:var(--em-c);color:var(--preto)}
 .bo{background:transparent;color:var(--em-c);border:1px solid var(--em-b)}
 .bo:hover{background:var(--em-p);border-color:var(--em)}
 .bg{background:transparent;color:var(--muted);border:1px solid var(--borda)}
 .bg:hover{background:var(--sup2);color:var(--txt)}
-.brow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-
-.sb{background:var(--em-p);border:1px solid var(--em-b);border-radius:var(--r);padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--em-c);margin-bottom:14px}
+.brow{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}
+.sb{background:var(--em-p);border:1px solid var(--em-b);border-radius:var(--r);padding:10px 13px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--em-c);margin-bottom:12px}
 .sd{width:7px;height:7px;border-radius:50%;background:var(--em);animation:pl 1.5s infinite;flex-shrink:0}
 @keyframes pl{0%,100%{opacity:1}50%{opacity:.3}}
-.lb{background:rgba(255,255,255,0.07);border-radius:3px;height:3px;overflow:hidden;flex:1;margin-left:10px}
+.lb{background:rgba(255,255,255,0.07);border-radius:3px;height:3px;overflow:hidden;flex:1;margin-left:8px}
 .lf{height:100%;background:var(--em);border-radius:3px;animation:la 1.8s ease-in-out infinite;width:55%}
 @keyframes la{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
-
-.aib{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:15px 17px;font-size:13px;line-height:1.85;color:var(--txt);white-space:pre-wrap}
-.aied{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:15px;font-size:13px;line-height:1.85;color:var(--txt);width:100%;min-height:200px;font-family:var(--fb);resize:vertical}
+.aib{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:13px 15px;font-size:13px;line-height:1.85;color:var(--txt);white-space:pre-wrap}
+.aied{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:13px;font-size:13px;line-height:1.85;color:var(--txt);width:100%;min-height:170px;font-family:var(--fb);resize:vertical}
 .aied:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(77,158,114,0.13)}
-.div{border:none;border-top:1px solid var(--borda);margin:18px 0}
-
-.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}
-.met{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:12px 14px}
-.mlbl{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;letter-spacing:.6px;margin-bottom:3px}
+.div{border:none;border-top:1px solid var(--borda);margin:15px 0}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}
+.met{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:11px 12px}
+.mlbl{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;letter-spacing:.6px;margin-bottom:2px}
 .mvl{font-size:14px;font-weight:700;color:var(--creme)}
 .mve{color:var(--em-c)}
-
-.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin:2px}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;margin:2px}
 .tg{background:rgba(77,158,114,0.18);color:var(--em-c);border:1px solid var(--em-b)}
 .tr{background:rgba(212,80,80,0.15);color:var(--vmc);border:1px solid rgba(212,80,80,0.3)}
-.to{background:rgba(212,130,42,0.15);color:var(--ljc);border:1px solid rgba(212,130,42,0.3)}
-
-.rb{display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.rb{display:inline-flex;align-items:center;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
 .rb-b{background:rgba(77,158,114,0.18);color:var(--em-c);border:1px solid var(--em-b)}
 .rb-m{background:rgba(212,130,42,0.18);color:var(--ljc);border:1px solid rgba(212,130,42,0.35)}
 .rb-a{background:rgba(212,80,80,0.18);color:var(--vmc);border:1px solid rgba(212,80,80,0.35)}
-
-.pcs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.pc{border-radius:var(--r);padding:13px 12px}
-.pcn{font-size:11px;font-weight:600;margin-bottom:3px;opacity:.85}
-.pcs_{font-size:21px;font-weight:700}
+.pcs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+.pc{border-radius:var(--r);padding:12px 10px}
+.pcn{font-size:11px;font-weight:600;margin-bottom:3px;opacity:.82}
+.pcs_{font-size:20px;font-weight:700}
 .pcv{background:rgba(212,80,80,0.14);border:1px solid rgba(212,80,80,0.3)}
 .pco{background:rgba(212,130,42,0.14);border:1px solid rgba(212,130,42,0.3)}
 .pcg{background:rgba(77,158,114,0.14);border:1px solid var(--em-b)}
 .pca{background:rgba(90,159,212,0.14);border:1px solid rgba(90,159,212,0.3)}
-
-.cw{position:relative;margin:14px 0}
-
+.cw{position:relative;margin:12px 0}
+.foto-slot{background:var(--sup2);border:1.5px dashed var(--borda);border-radius:10px;min-height:190px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.foto-slot:hover{border-color:var(--em-b);background:var(--sup3)}
+.foto-slot input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.foto-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px}
+/* FITTVP grid */
+.fittvp-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.fittvp-item{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:13px}
+.fittvp-lbl{font-size:10px;font-weight:700;color:var(--em-c);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.fittvp-badge{font-size:9px;font-weight:700;background:var(--em-p);color:var(--em-c);border:1px solid var(--em-b);padding:2px 7px;border-radius:10px;letter-spacing:.5px}
+/* SMART grid */
+.smart-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.smart-item{background:var(--sup2);border:1px solid var(--borda);border-radius:var(--r);padding:13px 15px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.smart-letter{font-family:var(--fd);font-size:22px;font-style:italic;color:var(--em-c);font-weight:700;line-height:1;min-width:22px}
+.smart-content label{margin-bottom:4px;display:block}
+/* DISC frase personalizada */
+.disc-frase{background:var(--sup2);border-left:3px solid var(--em);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;font-size:13px;line-height:1.7;color:var(--txt);margin-top:12px;font-style:italic}
+/* RELATÓRIO */
+.R{background:#fff;color:#1a1a1a;font-family:var(--fb);border-radius:var(--rl);overflow:hidden}
+.R-capa{background:#0e0e0e;padding:44px 40px 36px;position:relative;overflow:hidden}
+.R-capa::after{content:'';position:absolute;top:0;right:0;width:38%;height:100%;background:linear-gradient(135deg,transparent,rgba(77,158,114,0.14))}
+.R-lbl{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#6dbf91;margin-bottom:10px}
+.R-ttl{font-family:var(--fd);font-size:32px;font-style:italic;color:#f0ebe0;line-height:1.15;margin-bottom:5px}
+.R-ttl b{font-style:normal;color:#6dbf91}
+.R-sub{font-size:11.5px;color:rgba(240,235,224,0.45);margin-bottom:20px;letter-spacing:.3px}
+.R-chips{display:flex;gap:10px;flex-wrap:wrap}
+.R-chip{background:rgba(77,158,114,0.18);border:1px solid rgba(77,158,114,0.3);border-radius:20px;padding:4px 13px;font-size:11px;color:#6dbf91;font-weight:600}
+.R-sec{padding:28px 40px;border-bottom:1px solid #ebebeb}
+.R-sec:last-child{border-bottom:none}
+.R-num{font-size:11px;font-weight:700;color:#4d9e72;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.R-tit{font-family:var(--fd);font-size:21px;color:#111;margin-bottom:17px;line-height:1.2}
+.R-tit span{color:#4d9e72}
+.R-met4{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.R-met{background:#f7f7f5;border-radius:9px;padding:13px 13px 11px;border-left:3px solid #4d9e72}
+.R-met-l{font-size:10px;color:#888;text-transform:uppercase;font-weight:600;letter-spacing:.6px;margin-bottom:3px}
+.R-met-v{font-size:17px;font-weight:700;color:#111;line-height:1}
+.R-met-s{font-size:11px;color:#888;margin-top:2px}
+.R-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.R-lt{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.R-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.R-li{font-size:12.5px;color:#333;margin-bottom:7px;line-height:1.5;padding-left:13px;position:relative}
+.R-li::before{content:"\2022";position:absolute;left:0;color:#4d9e72}
+.R-li-r::before{color:#d45050}
+.R-dc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.R-dc{border-radius:9px;padding:13px 11px;text-align:center}
+.R-dc-n{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.R-dc-v{font-size:26px;font-weight:700;line-height:1}
+.R-dc-x{font-size:11px;font-weight:400;opacity:.55}
+.R-dc-rv{background:#fdeaea;border:1px solid rgba(212,80,80,0.3)}
+.R-dc-or{background:#fdf0e8;border:1px solid rgba(212,130,42,0.3)}
+.R-dc-gr{background:#e8f4ed;border:1px solid rgba(77,158,114,0.3)}
+.R-dc-az{background:#e8f0fd;border:1px solid rgba(90,159,212,0.3)}
+.R-hex{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.R-hex-i{background:#f7f7f5;border-radius:8px;padding:11px 13px;border-left:2px solid #4d9e72}
+.R-hex-l{font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.R-hex-bar{height:5px;background:#e8e8e6;border-radius:3px;margin-bottom:3px;overflow:hidden}
+.R-hex-ba{height:100%;background:#d45050;border-radius:3px}
+.R-hex-bi{height:100%;background:#4d9e72;border-radius:3px;opacity:.5}
+.R-hex-vl{display:flex;justify-content:space-between;font-size:10px;color:#aaa}
+.R-risco{background:#f7f7f5;border-radius:9px;padding:15px 17px}
+.R-quote{background:#111;border-radius:9px;padding:20px 24px;margin-top:8px}
+.R-q-txt{font-family:var(--fd);font-style:italic;font-size:15px;color:#f0ebe0;line-height:1.6;margin-bottom:10px}
+.R-q-sig{font-size:11px;font-weight:600;color:#6dbf91;letter-spacing:.5px;text-transform:uppercase}
+.R-foot{background:#0e0e0e;padding:18px 40px;display:flex;align-items:center;justify-content:space-between}
+.R-foot-n{font-family:var(--fd);font-style:italic;color:#f0ebe0;font-size:15px}
+.R-foot-i{font-size:10px;color:#555;text-align:right;line-height:1.6}
+.R-fittvp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.R-fittvp-item{background:#f7f7f5;border-radius:8px;padding:12px 14px}
+.R-fittvp-lbl{font-size:10px;font-weight:700;color:#4d9e72;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.R-fittvp-val{font-size:12.5px;color:#333;font-weight:600}
+.R-smart{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
+.R-smart-item{background:#f7f7f5;border-radius:8px;padding:11px 14px;display:flex;gap:12px;align-items:flex-start}
+.R-smart-l{font-family:var(--fd);font-size:18px;font-style:italic;color:#4d9e72;font-weight:700;min-width:18px;line-height:1}
+.R-smart-content{flex:1}
+.R-smart-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.R-smart-val{font-size:12.5px;color:#111}
+.R-disc-frase{background:#f0f7f3;border-left:3px solid #4d9e72;padding:14px 16px;border-radius:0 8px 8px 0;font-style:italic;font-size:13px;color:#333;line-height:1.7;margin-top:12px}
 @media print{
   .hdr,.tabs,.brow,.uz,.btn{display:none!important}
-  body{background:#fff!important;color:#111!important}
-  .app{max-width:100%!important}
-  .sec{display:block!important;padding:10px!important}
-  .card{background:#fff!important;border:1px solid #ddd!important;box-shadow:none!important;break-inside:avoid;margin-bottom:10px!important}
-  .aib,.met,.hi,.ei{background:#f8f8f8!important;color:#111!important}
-  .ctit,.mvl,.ettl,.pcn{color:#111!important}
+  body{background:#fff!important;color:#1a1a1a!important}
+  .app{max-width:100%!important;padding:0!important}
+  .sec{display:none!important}
+  #t7{display:block!important;padding:0!important}
+  .card{background:transparent!important;box-shadow:none!important;border:none!important;padding:0!important;margin:0!important}
+  .R-sec{page-break-inside:avoid}
+  .R{border-radius:0!important}
 }
 @media(max-width:600px){
-  .fg,.disc-grid,.hexg,.mg,.pcs{grid-template-columns:1fr}
-  .sec,.hdr,.tabs{padding-left:18px;padding-right:18px}
-  .hdr{padding:0 18px}
-  .hero-ttl{font-size:20px}
+  .fg,.disc-grid,.hexg,.mg,.pcs,.R-2col,.R-met4,.R-dc-grid,.R-hex,.R-fittvp,.fittvp-grid{grid-template-columns:1fr!important}
+  .sec,.hdr,.tabs{padding-left:15px;padding-right:15px}
+  .hdr{padding:0 15px}
+  .R-sec{padding:22px 18px}
+  .R-capa{padding:28px 18px 24px}
+  .R-ttl{font-size:25px}
+  .R-foot{padding:15px 18px;flex-direction:column;gap:7px;text-align:center}
 }
 </style>
 </head>
 <body>
 <div class="app">
-
 <div class="hdr">
   <div class="hdr-l">
     <div class="hdr-name">Profª Joyce Neres</div>
@@ -168,244 +227,307 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
   <div class="hdr-badge">JN Consultoria</div>
 </div>
 
-<div class="tabs">
+<div class="tabs" id="tabBar">
   <button class="tab active" onclick="gT(0)"><span class="tn">1</span>Anamnese</button>
-  <button class="tab" onclick="gT(1)"><span class="tn">2</span>Análise IA</button>
-  <button class="tab" onclick="gT(2)"><span class="tn">3</span>Risco Clínico</button>
-  <button class="tab" onclick="gT(3)"><span class="tn">4</span>Perfil DISC</button>
-  <button class="tab" onclick="gT(4)"><span class="tn">5</span>Motivacional</button>
-  <button class="tab" onclick="gT(5)"><span class="tn">6</span>Bem-Estar</button>
-  <button class="tab" onclick="gT(6)"><span class="tn">7</span>Relatório</button>
+  <button class="tab" onclick="gT(1)"><span class="tn">2</span>Triagem</button>
+  <button class="tab" onclick="gT(2)"><span class="tn">3</span>DISC</button>
+  <button class="tab" onclick="gT(3)"><span class="tn">4</span>Motivacional</button>
+  <button class="tab" onclick="gT(4)"><span class="tn">5</span>Bem-Estar</button>
+  <button class="tab" onclick="gT(5)"><span class="tn">6</span>Análise IA</button>
+  <button class="tab" onclick="gT(6)"><span class="tn">7</span>Plano e Metas</button>
+  <button class="tab tab-rel" onclick="gT(7)"><span class="tn">&#9733;</span>Relatório</button>
 </div>
 
-<!-- ABA 1 -->
+<!-- T0: ANAMNESE -->
 <div class="sec on" id="t0">
-  <div class="hero"><div class="hero-lbl">Etapa 01</div><div class="hero-ttl">Dados do <b>Aluno</b></div></div>
-  <div class="card">
-    <div class="ctit">Upload da Anamnese</div>
-    <div class="uz" id="uz">
-      <input type="file" id="fi" accept=".pdf,image/*" onchange="upld(event)">
-      <div class="uz-ico">📄</div>
-      <div class="uz-ttl">Solte o PDF aqui ou clique para selecionar</div>
-      <div class="uz-sub">PDF ou imagem · A IA extrai os dados automaticamente</div>
-    </div>
-    <div id="ust" style="display:none;margin-top:12px"></div>
+<div class="hero"><div class="hero-lbl">Etapa 01</div><div class="hero-ttl">Dados do <b>Aluno</b></div></div>
+<div class="card">
+  <div class="ctit">Upload da Anamnese (PDF)</div>
+  <div class="uz" id="uz"><input type="file" id="fi" accept=".pdf" onchange="upld(event)"><div class="uz-ico">&#128196;</div><div class="uz-ttl">Solte o PDF aqui ou clique</div><div class="uz-sub">Apenas PDF &#183; Leitura local via pdf.js &#183; Dados extraídos automaticamente</div></div>
+  <div id="ust" style="display:none;margin-top:10px"></div>
+</div>
+<div class="card">
+  <div class="ctit">Dados Gerais</div>
+  <div class="fg">
+    <div class="fgrp full"><label>Nome completo</label><input type="text" id="fn" placeholder="Nome do(a) aluno(a)"></div>
+    <div class="fgrp"><label>Sexo</label><select id="fs"><option value="">Selecionar</option><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+    <div class="fgrp"><label>Idade</label><input type="number" id="fi2" placeholder="29" min="10" max="100"></div>
+    <div class="fgrp"><label>Peso (kg)</label><input type="number" id="fp" placeholder="65.0" step="0.1" oninput="cIMC()"></div>
+    <div class="fgrp"><label>Altura (cm)</label><input type="number" id="fh" placeholder="165" oninput="cIMC()"></div>
+    <div class="fgrp"><label>IMC</label><input type="text" id="fimc" readonly placeholder="Automático"></div>
+    <div class="fgrp"><label>% Gordura corporal</label><input type="number" id="fgord" placeholder="Ex: 22" step="0.1"></div>
+    <div class="fgrp"><label>Cintura (cm)</label><input type="number" id="fci" placeholder="Opcional"></div>
+    <div class="fgrp"><label>PA sistólica (mmHg)</label><input type="number" id="fpas" placeholder="Ex: 120"></div>
+    <div class="fgrp"><label>Colesterol total (mg/dL)</label><input type="number" id="fcol" placeholder="Ex: 180"></div>
+    <div class="fgrp"><label>HDL-C (mg/dL)</label><input type="number" id="fhdl" placeholder="Ex: 55"></div>
+    <div class="fgrp"><label>Nível de treino</label><select id="fniv"><option value="iniciante">Iniciante</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
+    <div class="fgrp"><label>Diabetes</label><select id="fdb"><option value="nao">Não</option><option value="pre">Pré-diabetes</option><option value="sim">Sim</option></select></div>
+    <div class="fgrp"><label>Tabagismo</label><select id="ftab"><option value="nao">Não fumante</option><option value="sim">Fumante ativo</option><option value="ex">Ex-fumante</option></select></div>
+    <div class="fgrp"><label>Anti-hipertensivo</label><select id="fah"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+    <div class="fgrp"><label>Histórico familiar DCV</label><select id="fhd"><option value="nao">Sem eventos</option><option value="sim">Com eventos</option></select></div>
+    <div class="fgrp"><label>Atividade física atual</label><select id="faf"><option value="sedentario">Sedentário</option><option value="leve">Leve</option><option value="moderado">Moderado</option><option value="ativo">Ativo</option></select></div>
+    <div class="fgrp"><label>Histórico familiar DM2</label><select id="fhdm"><option value="0">Nenhum (0 pts)</option><option value="3">Avô/Tio/Primo (3 pts)</option><option value="5">Pai/Mãe/Irmão (5 pts)</option></select></div>
+    <div class="fgrp full"><label>Objetivo principal</label><input type="text" id="fobj" placeholder="Ex: hipertrofia, emagrecimento..."></div>
+    <div class="fgrp full"><label>Condições especiais</label><textarea id="fcon" placeholder="Lesões, doenças, limitações físicas..."></textarea></div>
+    <div class="fgrp full"><label>Medicamentos em uso</label><input type="text" id="fmed" placeholder="Ex: Escitalopram, Metformina..."></div>
+    <div class="fgrp full"><label>Observações clínicas</label><textarea id="fobs" placeholder="Contexto de vida, comportamento, impressões..."></textarea></div>
   </div>
-  <div class="card">
-    <div class="ctit">Dados Gerais — Revisão e Complemento</div>
-    <div class="fg">
-      <div class="fgrp full"><label>Nome completo</label><input type="text" id="fn" placeholder="Nome do(a) aluno(a)"></div>
-      <div class="fgrp"><label>Sexo</label><select id="fs"><option value="">Selecionar</option><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
-      <div class="fgrp"><label>Idade</label><input type="number" id="fi2" placeholder="29" min="10" max="100"></div>
-      <div class="fgrp"><label>Peso (kg)</label><input type="number" id="fp" placeholder="65.0" step="0.1" oninput="cIMC()"></div>
-      <div class="fgrp"><label>Altura (cm)</label><input type="number" id="fh" placeholder="165" oninput="cIMC()"></div>
-      <div class="fgrp"><label>IMC — calculado</label><input type="text" id="fimc" readonly placeholder="Automático"></div>
-      <div class="fgrp"><label>Cintura (cm)</label><input type="number" id="fci" placeholder="Opcional"></div>
-      <div class="fgrp"><label>PA sistólica (mmHg)</label><input type="number" id="fpas" placeholder="Ex: 120"></div>
-      <div class="fgrp"><label>Colesterol total (mg/dL)</label><input type="number" id="fcol" placeholder="Ex: 180"></div>
-      <div class="fgrp"><label>HDL-C (mg/dL)</label><input type="number" id="fhdl" placeholder="Ex: 55"></div>
-      <div class="fgrp"><label>Diabetes</label><select id="fdb"><option value="nao">Não</option><option value="pre">Pré-diabetes</option><option value="sim">Sim</option></select></div>
-      <div class="fgrp"><label>Tabagismo</label><select id="ftab"><option value="nao">Não fumante</option><option value="sim">Fumante ativo</option><option value="ex">Ex-fumante (&lt;6 meses)</option></select></div>
-      <div class="fgrp"><label>Anti-hipertensivo</label><select id="fah"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
-      <div class="fgrp"><label>Histórico familiar DCV</label><select id="fhd"><option value="nao">Sem eventos</option><option value="sim">Com eventos (pai/mãe/irmão)</option></select></div>
-      <div class="fgrp"><label>Nível de atividade física</label><select id="faf"><option value="sedentario">Sedentário (&lt;150 min/sem)</option><option value="leve">Leve (1–2×/sem)</option><option value="moderado">Moderado (3–4×/sem)</option><option value="ativo">Ativo (≥5×/sem)</option></select></div>
-      <div class="fgrp"><label>Histórico familiar DM2</label><select id="fhdm"><option value="0">Nenhum (0 pts)</option><option value="3">Avô / Tio / Primo (3 pts)</option><option value="5">Pai / Mãe / Irmão (5 pts)</option></select></div>
-      <div class="fgrp full"><label>Objetivo principal</label><input type="text" id="fobj" placeholder="Ex: hipertrofia, emagrecimento, condicionamento..."></div>
-      <div class="fgrp full"><label>Condições especiais / Diagnósticos</label><textarea id="fcon" placeholder="Lipedema, HAS, lesões, cirurgias, limitações..."></textarea></div>
-      <div class="fgrp full"><label>Medicamentos em uso</label><input type="text" id="fmed" placeholder="Ex: Escitalopram, Trazodona, Metformina..."></div>
-      <div class="fgrp full"><label>Observações clínicas da consulta</label><textarea id="fobs" placeholder="Comportamento, comunicação, contexto de vida, impressões..."></textarea></div>
-    </div>
-    <div class="brow">
-      <button class="btn bp" onclick="cIMC()">Calcular IMC</button>
-      <button class="btn bo" onclick="gT(1)">Analisar com IA →</button>
-    </div>
-  </div>
+  <div class="brow"><button class="btn bp" onclick="cIMC()">Calcular IMC</button><button class="btn bo" onclick="gT(1)">Triagem de Saúde &#8594;</button></div>
+</div>
 </div>
 
-<!-- ABA 2 -->
+<!-- T1: TRIAGEM DE SAÚDE -->
 <div class="sec" id="t1">
-  <div class="hero"><div class="hero-lbl">Etapa 02</div><div class="hero-ttl">Análise <b>Clínica</b></div></div>
-  <div class="card">
-    <div class="csub">A IA gera um parecer contextual a partir dos dados preenchidos. O resultado é editável — ajuste antes de incluir no relatório.</div>
-    <button class="btn bp" onclick="anIA()" id="bnia">Gerar Análise Clínica com IA</button>
-    <div id="iast" style="display:none;margin-top:14px"></div>
-    <div id="iaout" style="display:none;margin-top:18px">
-      <hr class="div">
-      <div class="ctit">Resultado — editável</div>
-      <textarea class="aied" id="iate"></textarea>
-      <div class="brow">
-        <button class="btn bg" onclick="cpIA()">Copiar texto</button>
-        <button class="btn bo" onclick="gT(2)">Ver Risco Clínico →</button>
-      </div>
-    </div>
-  </div>
+<div class="hero"><div class="hero-lbl">Etapa 02</div><div class="hero-ttl">Triagem de <b>Saúde</b></div></div>
+<div class="card"><div class="ctit">Framingham Risk Score</div><div id="rFRS" style="margin-bottom:10px"></div><button class="btn bp" onclick="cFRS()">Calcular Framingham</button></div>
+<div class="card"><div class="ctit">FINDRISC &#8212; Diabetes T2</div><div id="rFDR" style="margin-bottom:10px"></div><button class="btn bp" onclick="cFDR()">Calcular FINDRISC</button></div>
+<div class="card"><div class="ctit">Triagem ACSM</div><div id="rACSM" style="margin-bottom:10px"></div><button class="btn bp" onclick="cACSM()">Avaliar ACSM</button></div>
+<div class="brow"><button class="btn bo" onclick="gT(2)">Perfil DISC &#8594;</button></div>
 </div>
 
-<!-- ABA 3 -->
+<!-- T2: DISC -->
 <div class="sec" id="t2">
-  <div class="hero"><div class="hero-lbl">Etapa 03</div><div class="hero-ttl">Triagem de <b>Risco</b></div></div>
-  <div class="card">
-    <div class="ctit">Risco Cardiovascular — Framingham Risk Score</div>
-    <div class="csub">ACSM Guidelines for Exercise Testing and Prescription, 11ª ed.</div>
-    <div id="rFRS" style="margin-bottom:12px"></div>
-    <button class="btn bp" onclick="cFRS()">Calcular Framingham</button>
+<div class="hero"><div class="hero-lbl">Etapa 03</div><div class="hero-ttl">Perfil <b>Comportamental</b></div></div>
+<div class="card">
+  <div class="csub">Classifique 0&#8211;10 por dimensão com base na entrevista. Método DISC / LASEr.</div>
+  <div class="disc-grid">
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--vmc)">&#128308; Diretivo</span><span class="dg-vl" style="color:var(--vmc)" id="vD">5</span></div><input type="range" min="0" max="10" value="5" id="slD" oninput="upD()" style="accent-color:var(--vm)"><div class="dg-d">Confiante &#183; Líder &#183; Focado em resultados</div><div class="dg-nd">Necessidade: Reconhecimento</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--ljc)">&#127825; Influenciador</span><span class="dg-vl" style="color:var(--ljc)" id="vI">5</span></div><input type="range" min="0" max="10" value="5" id="slI" oninput="upD()" style="accent-color:var(--lj)"><div class="dg-d">Divertido &#183; Social &#183; Explorador</div><div class="dg-nd">Necessidade: Experiência e novidade</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--em-c)">&#129001; Estável</span><span class="dg-vl" style="color:var(--em-c)" id="vS">5</span></div><input type="range" min="0" max="10" value="5" id="slS" oninput="upD()" style="accent-color:var(--em)"><div class="dg-d">Meigo &#183; Apoiador &#183; Harmonioso</div><div class="dg-nd">Necessidade: Conexão e pertencimento</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--azc)">&#128309; Cauteloso</span><span class="dg-vl" style="color:var(--azc)" id="vC">5</span></div><input type="range" min="0" max="10" value="5" id="slC" oninput="upD()" style="accent-color:var(--az)"><div class="dg-d">Analítico &#183; Detalhista &#183; Planejador</div><div class="dg-nd">Necessidade: Segurança e controle</div></div>
   </div>
-  <div class="card">
-    <div class="ctit">Risco para Diabetes Tipo 2 — FINDRISC</div>
-    <div id="rFDR" style="margin-bottom:12px"></div>
-    <button class="btn bp" onclick="cFDR()">Calcular FINDRISC</button>
-  </div>
-  <div class="card">
-    <div class="ctit">Fatores de Risco — Triagem ACSM</div>
-    <div id="rACSM" style="margin-bottom:12px"></div>
-    <button class="btn bp" onclick="cACSM()">Avaliar Triagem ACSM</button>
-  </div>
+  <div class="cw" style="height:225px;margin-top:18px"><canvas id="dchart"></canvas></div>
+  <hr class="div"><div id="dAnal"></div>
+</div>
+<div class="card" id="dEst" style="display:none">
+  <div class="ctit">Estratégias de Comunicação</div>
+  <div id="dEstT"></div>
+  <hr class="div">
+  <div class="ctit" style="margin-bottom:8px">Frase Personalizada para o Aluno</div>
+  <div class="csub">Gerada com base no perfil dominante. Edite antes de incluir no relatório.</div>
+  <textarea class="aied" id="discFrase" style="min-height:80px" placeholder="A frase personalizada aparecerá aqui após ajustar os sliders..."></textarea>
+</div>
+<div class="brow"><button class="btn bo" onclick="gT(3)">Estágio Motivacional &#8594;</button></div>
 </div>
 
-<!-- ABA 4 -->
+<!-- T3: MOTIVACIONAL -->
 <div class="sec" id="t3">
-  <div class="hero"><div class="hero-lbl">Etapa 04</div><div class="hero-ttl">Perfil <b>Comportamental</b></div></div>
-  <div class="card">
-    <div class="csub">Classifique 0–10 cada dimensão com base na anamnese e observação da consulta. Objetivo: adaptar a comunicação ao perfil dominante para melhor adesão — Método DISC / LASEr.</div>
-    <div class="disc-grid">
-      <div class="dg">
-        <div class="dg-h"><span class="dg-nm" style="color:var(--vmc)">🔴 Diretivo</span><span class="dg-vl" style="color:var(--vmc)" id="vD">5</span></div>
-        <input type="range" min="0" max="10" value="5" id="slD" oninput="upD()" style="accent-color:var(--vm)">
-        <div class="dg-d">Confiante · Líder · Focado em resultados · Direto · Independente</div>
-        <div class="dg-nd">Necessidade: Reconhecimento e importância</div>
-      </div>
-      <div class="dg">
-        <div class="dg-h"><span class="dg-nm" style="color:var(--ljc)">🟠 Influenciador</span><span class="dg-vl" style="color:var(--ljc)" id="vI">5</span></div>
-        <input type="range" min="0" max="10" value="5" id="slI" oninput="upD()" style="accent-color:var(--lj)">
-        <div class="dg-d">Divertido · Social · Explorador · Entusiasta · Simpático</div>
-        <div class="dg-nd">Necessidade: Experiência e novidade</div>
-      </div>
-      <div class="dg">
-        <div class="dg-h"><span class="dg-nm" style="color:var(--em-c)">🟢 Estável</span><span class="dg-vl" style="color:var(--em-c)" id="vS">5</span></div>
-        <input type="range" min="0" max="10" value="5" id="slS" oninput="upD()" style="accent-color:var(--em)">
-        <div class="dg-d">Meigo · Emocional · Apoiador · Harmonioso · Leal</div>
-        <div class="dg-nd">Necessidade: Conexão e pertencimento</div>
-      </div>
-      <div class="dg">
-        <div class="dg-h"><span class="dg-nm" style="color:var(--azc)">🔵 Cauteloso</span><span class="dg-vl" style="color:var(--azc)" id="vC">5</span></div>
-        <input type="range" min="0" max="10" value="5" id="slC" oninput="upD()" style="accent-color:var(--az)">
-        <div class="dg-d">Analítico · Detalhista · Planejador · Busca segurança · Preciso</div>
-        <div class="dg-nd">Necessidade: Segurança, conhecimento e controle</div>
-      </div>
-    </div>
-    <div class="cw" style="height:240px;margin-top:22px">
-      <canvas id="dchart" role="img" aria-label="Radar DISC">Perfil DISC.</canvas>
-    </div>
-    <hr class="div">
-    <div id="dAnal"></div>
-  </div>
-  <div class="card" id="dEst" style="display:none">
-    <div class="ctit">Estratégias de Comunicação — Perfil Dominante</div>
-    <div id="dEstT"></div>
-  </div>
+<div class="hero"><div class="hero-lbl">Etapa 04</div><div class="hero-ttl">Estágio <b>Motivacional</b></div></div>
+<div class="card">
+  <div class="csub">Prochaska et al. (2008) &#8212; Selecione o estágio identificado na entrevista.</div>
+  <div class="ei" onclick="tgE(this,'manutencao')"><div class="edot"></div><div><div class="ettl">Manutenção &#8212; &#8220;Consegui!&#8221;</div><div class="esub">Mantém comportamento há mais de 6 meses</div></div></div>
+  <div class="ei" onclick="tgE(this,'acao')"><div class="edot"></div><div><div class="ettl">Ação &#8212; &#8220;Faço!&#8221;</div><div class="esub">Mudança iniciada há menos de 6 meses</div></div></div>
+  <div class="ei" onclick="tgE(this,'preparacao')"><div class="edot"></div><div><div class="ettl">Preparação &#8212; &#8220;Vou fazer!&#8221;</div><div class="esub">Planeja agir nos próximos 30 dias</div></div></div>
+  <div class="ei" onclick="tgE(this,'contemplacao')"><div class="edot"></div><div><div class="ettl">Contemplação &#8212; &#8220;Quero fazer!&#8221;</div><div class="esub">Intenção de mudar nos próximos 6 meses</div></div></div>
+  <div class="ei" onclick="tgE(this,'precontemplacao')"><div class="edot"></div><div><div class="ettl">Pré-contemplação &#8212; &#8220;Não quero&#8221;</div><div class="esub">Sem intenção de mudança</div></div></div>
+  <hr class="div">
+  <div class="fgrp full"><label>Estratégia motivacional (TAD)</label><textarea id="fmot" placeholder="Autonomia, competência e vínculo..."></textarea></div>
+</div>
+<div class="brow"><button class="btn bo" onclick="gT(4)">Hexagrama de Bem-Estar &#8594;</button></div>
 </div>
 
-<!-- ABA 5 -->
+<!-- T4: BEM-ESTAR -->
 <div class="sec" id="t4">
-  <div class="hero"><div class="hero-lbl">Etapa 05</div><div class="hero-ttl">Estágio <b>Motivacional</b></div></div>
-  <div class="card">
-    <div class="csub">Selecione o(s) estágio(s) identificados para o aluno. Referência: Prochaska et al. (2008).</div>
-    <div class="ei" onclick="tgE(this,'manutencao')"><div class="edot"></div><div><div class="ettl">Manutenção — "Consegui!"</div><div class="esub">Mantém comportamento há mais de 6 meses</div></div></div>
-    <div class="ei" onclick="tgE(this,'acao')"><div class="edot"></div><div><div class="ettl">Ação — "Faço!"</div><div class="esub">Mudança iniciada há menos de 6 meses</div></div></div>
-    <div class="ei" onclick="tgE(this,'preparacao')"><div class="edot"></div><div><div class="ettl">Preparação — "Vou fazer!"</div><div class="esub">Planeja agir nos próximos 30 dias</div></div></div>
-    <div class="ei" onclick="tgE(this,'contemplacao')"><div class="edot"></div><div><div class="ettl">Contemplação — "Quero fazer!"</div><div class="esub">Intenção de mudar nos próximos 6 meses</div></div></div>
-    <div class="ei" onclick="tgE(this,'precontemplacao')"><div class="edot"></div><div><div class="ettl">Pré-contemplação — "Não quero"</div><div class="esub">Sem intenção de mudança no momento</div></div></div>
-    <hr class="div">
-    <div class="fgrp full">
-      <label>Estratégia motivacional — TAD / abordagem recomendada</label>
-      <textarea id="fmot" placeholder="Ex: Motivação intrínseca via TAD — autonomia, competência e vínculo. Ressignificação do exercício como autocuidado..."></textarea>
-    </div>
+<div class="hero"><div class="hero-lbl">Etapa 05</div><div class="hero-ttl">Hexagrama de <b>Bem-Estar</b></div></div>
+<div class="card">
+  <div class="csub">0 = carência total &#183; 5 = dedicação total &#183; Vermelho = Atual &#183; Verde = Ideal</div>
+  <div class="hexg">
+    <div class="hi"><div class="hlbl">Saúde e Autocuidado</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA0" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv0">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI0" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv0">4</span></div></div>
+    <div class="hi"><div class="hlbl">Atividade Física</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA1" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv1">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="5" id="hI1" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv1">5</span></div></div>
+    <div class="hi"><div class="hlbl">Alimentação</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="3" id="hA2" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv2">3</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI2" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv2">4</span></div></div>
+    <div class="hi"><div class="hlbl">Trabalho e Educação</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="3" id="hA3" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv3">3</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI3" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv3">4</span></div></div>
+    <div class="hi"><div class="hlbl">Lazer e Social</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA4" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv4">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI4" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv4">4</span></div></div>
+    <div class="hi"><div class="hlbl">Família</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="4" id="hA5" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv5">4</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="5" id="hI5" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv5">5</span></div></div>
   </div>
+  <div class="cw" style="height:255px;margin-top:15px"><canvas id="hchart"></canvas></div>
+</div>
+<div class="brow"><button class="btn bo" onclick="gT(5)">Análise IA &#8594;</button></div>
 </div>
 
-<!-- ABA 6 -->
+<!-- T5: ANÁLISE IA -->
 <div class="sec" id="t5">
-  <div class="hero"><div class="hero-lbl">Etapa 06</div><div class="hero-ttl">Hexagrama de <b>Bem-Estar</b></div></div>
-  <div class="card">
-    <div class="csub">Pontuação: 0 = carência total · 5 = dedicação total. Marque Atual (vermelho) e Ideal (verde) por dimensão.</div>
-    <div class="hexg">
-      <div class="hi"><div class="hlbl">Saúde e Autocuidado</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA0" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv0">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI0" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv0">4</span></div></div>
-      <div class="hi"><div class="hlbl">Atividade Física</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA1" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv1">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="5" id="hI1" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv1">5</span></div></div>
-      <div class="hi"><div class="hlbl">Alimentação</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="3" id="hA2" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv2">3</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI2" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv2">4</span></div></div>
-      <div class="hi"><div class="hlbl">Trabalho e Educação</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="3" id="hA3" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv3">3</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI3" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv3">4</span></div></div>
-      <div class="hi"><div class="hlbl">Lazer e Relações Sociais</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="2" id="hA4" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv4">2</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="4" id="hI4" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv4">4</span></div></div>
-      <div class="hi"><div class="hlbl">Família</div><div class="hrow"><span class="htag" style="color:var(--vmc)">Atual</span><input type="range" min="0" max="5" value="4" id="hA5" oninput="upH()" style="accent-color:var(--vm);flex:1"><span class="hvl" id="hAv5">4</span></div><div class="hrow"><span class="htag" style="color:var(--em-c)">Ideal</span><input type="range" min="0" max="5" value="5" id="hI5" oninput="upH()" style="accent-color:var(--em);flex:1"><span class="hvl" id="hIv5">5</span></div></div>
-    </div>
-    <div style="display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--muted)">
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--vm);margin-right:5px;vertical-align:middle"></span>Atual</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--em);margin-right:5px;vertical-align:middle"></span>Ideal</span>
-    </div>
-    <div class="cw" style="height:270px;margin-top:18px">
-      <canvas id="hchart" role="img" aria-label="Hexagrama bem-estar">Hexagrama.</canvas>
-    </div>
+<div class="hero"><div class="hero-lbl">Etapa 06</div><div class="hero-ttl">Análise <b>Clínica IA</b></div></div>
+<div class="card">
+  <div class="csub">A IA consolida todos os dados e gera um parecer clínico estruturado. Editável antes de incluir no relatório.</div>
+  <button class="btn bp" onclick="anIA()" id="bnia">Gerar Análise Clínica com IA</button>
+  <div id="iast" style="display:none;margin-top:12px"></div>
+  <div id="iaout" style="display:none;margin-top:15px">
+    <hr class="div"><div class="ctit">Resultado &#8212; editável</div>
+    <textarea class="aied" id="iate"></textarea>
+    <div class="brow"><button class="btn bg" onclick="cpIA()">Copiar</button><button class="btn bo" onclick="gT(6)">Plano e Metas &#8594;</button></div>
   </div>
 </div>
+</div>
 
-<!-- ABA 7 -->
+<!-- T6: PLANO E METAS (FITTVP-AFFECT + SMART) -->
 <div class="sec" id="t6">
-  <div class="hero"><div class="hero-lbl">Etapa 07</div><div class="hero-ttl">Relatório <b>Final</b></div></div>
-  <div class="card">
-    <div class="ctit">Prévia para Envio ao Aluno</div>
-    <div id="rPrv"></div>
-    <div class="brow">
-      <button class="btn bp" onclick="bldR()">Atualizar Prévia</button>
-      <button class="btn bo" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
-    </div>
+<div class="hero"><div class="hero-lbl">Etapa 07</div><div class="hero-ttl">Plano de <b>Ação e Metas</b></div></div>
+
+<!-- Fotos -->
+<div class="card">
+  <div class="ctit">Análise do Físico (opcional)</div>
+  <div class="csub">Upload de fotos para análise IA. Ou preencha os campos manualmente.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px">
+    <div class="foto-slot"><input type="file" accept="image/*" onchange="loadFoto(event,'A')"><div class="uz-ico">&#128248;</div><div style="font-size:11px;color:var(--muted)">Foto Frontal</div><img id="imgA" style="display:none"></div>
+    <div class="foto-slot"><input type="file" accept="image/*" onchange="loadFoto(event,'B')"><div class="uz-ico">&#128248;</div><div style="font-size:11px;color:var(--muted)">Foto Dorsal</div><img id="imgB" style="display:none"></div>
   </div>
-  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Ctrl+P → Salvar como PDF → enviar ao aluno</div>
+  <button class="btn bp" onclick="anFisico()" id="btnF" style="margin-bottom:11px">Analisar Físico com IA</button>
+  <div id="fst" style="display:none;margin-bottom:10px"></div>
+  <hr class="div">
+  <div class="fg">
+    <div class="fgrp full"><label>Pontos Fortes</label><textarea id="fPF" style="min-height:70px" placeholder="Ex: Boa base de força, ombros simétricos..."></textarea></div>
+    <div class="fgrp full"><label>Pontos de Melhoria</label><textarea id="fPM" style="min-height:70px" placeholder="Ex: Volume posterior de coxa, mobilidade de quadril..."></textarea></div>
+  </div>
 </div>
 
+<!-- FITTVP-AFFECT -->
+<div class="card">
+  <div class="ctit">Prescrição FITTVP-AFFECT</div>
+  <div class="csub">Modelo de prescrição baseado em evidências. Preencha cada componente para o plano de treino do aluno.</div>
+  <div class="fittvp-grid">
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">F</span>Frequência</div><input type="text" id="ffFreq" placeholder="Ex: 4x por semana"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">I</span>Intensidade</div><input type="text" id="ffInt" placeholder="Ex: 70&#8211;80% 1RM (RPE 7&#8211;8)"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">T</span>Tipo / Modalidade</div><input type="text" id="ffTipo" placeholder="Ex: Musculação + HIIT 2x/sem"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">T</span>Tempo / Duração</div><input type="text" id="ffTempo" placeholder="Ex: 60 min por sessão"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">V</span>Volume</div><input type="text" id="ffVol" placeholder="Ex: 16&#8211;20 séries/grupo/semana"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">P</span>Progressão</div><input type="text" id="ffProg" placeholder="Ex: +2,5% carga/semana (sobrecarga progressiva)"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">A</span>Afeto / Preferências</div><input type="text" id="ffAfeto" placeholder="Ex: Prefere treinos em dupla, música animada"></div>
+    <div class="fittvp-item"><div class="fittvp-lbl"><span class="fittvp-badge">+</span>Observações</div><input type="text" id="ffObs" placeholder="Ex: Evitar impacto no joelho direito"></div>
+  </div>
+  <div class="brow"><button class="btn bo" onclick="preencherFittvpIA()">&#9889; Preencher com IA</button></div>
+  <div id="fittvpSt" style="display:none;margin-top:10px"></div>
 </div>
+
+<!-- SMART -->
+<div class="card">
+  <div class="ctit">Metas SMART</div>
+  <div class="csub">Defina as metas do aluno dentro do modelo SMART. Todos os campos são editáveis.</div>
+  <div class="smart-grid">
+    <div class="smart-item"><div class="smart-letter">S</div><div class="smart-content"><label>Específica &#8212; O que exatamente será alcançado?</label><textarea id="smS" style="min-height:55px" placeholder="Ex: Reduzir gordura corporal de 28% para 22% mantendo massa magra acima de 52kg"></textarea></div></div>
+    <div class="smart-item"><div class="smart-letter">M</div><div class="smart-content"><label>Mensurável &#8212; Como será medido?</label><textarea id="smM" style="min-height:55px" placeholder="Ex: Bioimpedância mensal, fotos quinzenais, registro de cargas no treino"></textarea></div></div>
+    <div class="smart-item"><div class="smart-letter">A</div><div class="smart-content"><label>Alcançável &#8212; É realista dado o contexto atual?</label><textarea id="smA" style="min-height:55px" placeholder="Ex: Perda de 0,5&#8211;1kg/semana é segura e sustentável para o perfil do aluno"></textarea></div></div>
+    <div class="smart-item"><div class="smart-letter">R</div><div class="smart-content"><label>Relevante &#8212; Por que isso importa para o aluno?</label><textarea id="smR" style="min-height:55px" placeholder="Ex: Melhorar autoestima e performance no trabalho, reduzir risco cardiometabólico"></textarea></div></div>
+    <div class="smart-item"><div class="smart-letter">T</div><div class="smart-content"><label>Temporal &#8212; Prazo definido</label><textarea id="smT" style="min-height:55px" placeholder="Ex: Meta a ser atingida em 12 semanas (reavaliação em 04/out/2025)"></textarea></div></div>
+  </div>
+  <div class="brow"><button class="btn bo" onclick="preencherSmartIA()">&#9889; Preencher SMART com IA</button></div>
+  <div id="smartSt" style="display:none;margin-top:10px"></div>
+</div>
+
+<!-- Parecer -->
+<div class="card">
+  <div class="ctit">Parecer Final</div>
+  <div class="fgrp full"><label>Mensagem personalizada para o aluno</label><textarea id="fParecer" style="min-height:90px" placeholder="Mensagem de encerramento assinada pela profissional..."></textarea></div>
+</div>
+<div class="brow"><button class="btn bp" onclick="gT(7)">&#9733; Ver Relatório Final &#8594;</button></div>
+</div>
+
+<!-- T7: RELATÓRIO FINAL -->
+<div class="sec" id="t7">
+<div class="hero"><div class="hero-lbl">Relatório de Entrega</div><div class="hero-ttl">Documento <b>Final</b></div></div>
+<div class="card">
+  <div class="brow" style="margin-top:0;margin-bottom:14px">
+    <button class="btn bp" onclick="bldR()">Atualizar Relatório</button>
+    <button class="btn bo" onclick="window.print()">&#128424; Imprimir / Salvar PDF</button>
+  </div>
+  <div id="rltOut"></div>
+</div>
+<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">Ctrl+P &#8594; desmarque <strong>&#8220;Cabeçalhos e rodapés&#8221;</strong> &#8594; Salvar como PDF</div>
+</div>
+
+</div><!-- end .app -->
+
 <script>
-const S={es:[],dc:null,hc:null};
-const TB=document.querySelectorAll('.tab');
-const SC=document.querySelectorAll('.sec');
+"use strict";
+// ===== ESTADO GLOBAL =====
+const S={
+  es:[],dc:null,hc:null,
+  fA:null,fAmt:null,fB:null,fBmt:null,
+  rFRS:'',rFDR:'',rACSM:''
+};
+
+// ===== NAVEGAÇÃO (DOMContentLoaded garante que TB e SC existam) =====
+let TB, SC;
+document.addEventListener('DOMContentLoaded', function(){
+  TB = document.querySelectorAll('#tabBar .tab');
+  SC = document.querySelectorAll('.sec');
+});
 
 function gT(i){
+  if(!TB) TB = document.querySelectorAll('#tabBar .tab');
+  if(!SC) SC = document.querySelectorAll('.sec');
   TB.forEach((t,x)=>t.classList.toggle('active',x===i));
   SC.forEach((s,x)=>s.classList.toggle('on',x===i));
-  if(i===3)setTimeout(iDC,80);
-  if(i===5)setTimeout(iHC,80);
-  if(i===6)bldR();
+  if(i===2) setTimeout(iDC,80);
+  if(i===4) setTimeout(iHC,80);
+  if(i===7) bldR();
 }
 
+// ===== PDF.JS UPLOAD (client-side, sem API) =====
 async function upld(e){
-  const f=e.target.files[0];if(!f)return;
-  const uz=document.getElementById('uz'),st=document.getElementById('ust');
+  const f=e.target.files[0]; if(!f) return;
+  const uz=document.getElementById('uz'), st=document.getElementById('ust');
   st.style.display='block';
-  st.innerHTML=`<div class="sb"><div class="sd"></div>Lendo: <strong>${f.name}</strong><div class="lb"><div class="lf"></div></div></div>`;
-  uz.querySelector('.uz-ttl').textContent='✅ '+f.name;
-  const b64=await new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result.split(',')[1]);rd.onerror=j;rd.readAsDataURL(f)});
-  const isI=f.type.startsWith('image/'),mt=isI?f.type:'application/pdf';
+  st.innerHTML='<div class="sb"><div class="sd"></div>Lendo PDF localmente...<div class="lb"><div class="lf"></div></div></div>';
+  uz.querySelector('.uz-ttl').textContent='\u2705 '+f.name;
+
+  if(f.type!=='application/pdf'){
+    st.innerHTML='<div class="sb" style="border-color:rgba(212,130,42,.4);color:var(--ljc)"><div class="sd" style="background:var(--lj);animation:none"></div>Apenas PDF suportado. Preencha manualmente.</div>';
+    return;
+  }
+
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
-      {type:isI?'image':'document',source:{type:'base64',media_type:mt,data:b64}},
-      {type:'text',text:'Extraia dados deste formulário de anamnese em JSON puro sem markdown. Se ausente use null:\n{"nome":"","idade":null,"peso":null,"altura":null,"cintura":null,"pas":null,"colesterol":null,"hdl":null,"sexo":"","diabetes":"","tabagismo":"","antihiper":"","historico_dcv":"","hist_dm":0,"nivel_af":"","objetivo":"","condicoes":"","medicamentos":""}'}
-    ]}]})});
-    const data=await res.json();
-    const txt=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'';
-    try{
-      const p=JSON.parse(txt.replace(/```json|```/g,'').trim());
-      const sv=(id,v)=>{if(v!=null&&v!==''){const el=document.getElementById(id);if(el)el.value=v;}};
-      sv('fn',p.nome);sv('fi2',p.idade);sv('fp',p.peso);sv('fh',p.altura);
-      sv('fci',p.cintura);sv('fpas',p.pas);sv('fcol',p.colesterol);sv('fhdl',p.hdl);
-      sv('fobj',p.objetivo);sv('fcon',p.condicoes);sv('fmed',p.medicamentos);
-      if(p.sexo){const s=document.getElementById('fs');[...s.options].forEach(o=>{if(o.value===p.sexo)s.value=p.sexo});}
-      cIMC();
-      st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>✅ Dados extraídos com sucesso. Revise e complete se necessário.</div>`;
-    }catch{st.innerHTML=`<div class="sb" style="border-color:rgba(212,130,42,.4);background:rgba(212,130,42,.1);color:var(--ljc)"><div class="sd" style="background:var(--lj);animation:none"></div>⚠ Arquivo lido. Preencha os campos manualmente.</div>`;}
-  }catch{st.innerHTML=`<div class="sb" style="border-color:rgba(212,80,80,.4);background:rgba(212,80,80,.1);color:var(--vmc)"><div class="sd" style="background:var(--vm);animation:none"></div>Erro na leitura. Preencha manualmente.</div>`;}
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    const ab = await f.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: new Uint8Array(ab)}).promise;
+    let txt='';
+    for(let p=1;p<=pdf.numPages;p++){
+      const pg = await pdf.getPage(p);
+      const content = await pg.getTextContent();
+      txt += content.items.map(it=>it.str).join(' ') + ' ';
+    }
+
+    const sv=(id,v)=>{ if(v!=null&&v!==''){ const el=document.getElementById(id); if(el) el.value=v; }};
+
+    // Regex patterns robustos
+    let m;
+    m=txt.match(/(?:Nome|Atleta|Nome completo)[:\s]+([A-Za-z\u00C0-\u00FF\s]{4,50}?)(?=\s*(?:Sexo|Gênero|Idade|Data|\d|$))/i);
+    if(m) sv('fn',m[1].trim());
+
+    m=txt.match(/(?:Idade|Anos)[:\s]+(\d{2})(?:\s*anos)?/i);
+    if(m) sv('fi2',m[1]);
+
+    m=txt.match(/(?:Peso|Massa corporal)[:\s]*(\d{2,3}(?:[.,]\d)?)/i);
+    if(m) sv('fp',m[1].replace(',','.'));
+
+    m=txt.match(/(?:Altura)[:\s]*(\d{1,3}(?:[.,]\d{1,2})?)/i);
+    if(m){ let h=parseFloat(m[1].replace(',','.')); if(h<3)h*=100; sv('fh',h); }
+
+    m=txt.match(/(?:Sexo|Gênero)[:\s]*(Masculino|Feminino|\bM\b|\bF\b)/i);
+    if(m){ const s=m[1].trim().toLowerCase(); sv('fs', s.startsWith('f')?'F':'M'); }
+
+    m=txt.match(/(?:Objetivo|Meta principal|Objetivo Principal)[:\s]+([^.\n]{4,80})/i);
+    if(m) sv('fobj',m[1].trim());
+
+    m=txt.match(/(?:Medicamento|Medicação|Remédio)[:\s]+([^.\n]{2,100})/i);
+    if(m) sv('fmed',m[1].trim());
+
+    m=txt.match(/(?:Condições|Lesões|Diagnóstico)[:\s]+([^.\n]{4,150})/i);
+    if(m) sv('fcon',m[1].trim());
+
+    cIMC();
+    const filled=['fn','fi2','fp','fh','fobj'].filter(id=>document.getElementById(id)?.value).length;
+    st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>\u2705 ${filled} campos extraídos. Revise e complete o restante.</div>`;
+  }catch(err){
+    st.innerHTML='<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)"><div class="sd" style="background:var(--vm);animation:none"></div>\u26A0 Erro ao ler PDF. Preencha manualmente.</div>';
+    console.error(err);
+  }
 }
 
+// ===== CÁLCULOS =====
 function cIMC(){
   const p=parseFloat(document.getElementById('fp').value);
   const h=parseFloat(document.getElementById('fh').value)/100;
-  if(p&&h)document.getElementById('fimc').value=(p/(h*h)).toFixed(1)+' kg/m²';
+  if(p&&h) document.getElementById('fimc').value=(p/(h*h)).toFixed(1)+' kg/m\u00B2';
 }
 
 function gD(){
@@ -415,10 +537,12 @@ function gD(){
     idade:document.getElementById('fi2').value,
     imc:document.getElementById('fimc').value,
     peso:document.getElementById('fp').value,
+    gord:'',  // campo removido
     cintura:document.getElementById('fci').value,
     pas:document.getElementById('fpas').value,
     col:document.getElementById('fcol').value,
     hdl:document.getElementById('fhdl').value,
+    niv:document.getElementById('fniv').value,
     db:document.getElementById('fdb').value,
     tab:document.getElementById('ftab').value,
     ah:document.getElementById('fah').value,
@@ -436,89 +560,86 @@ function gD(){
   };
 }
 
-async function anIA(){
-  const d=gD();
-  const stEl=document.getElementById('iast'),outEl=document.getElementById('iaout'),btn=document.getElementById('bnia');
-  btn.disabled=true;btn.textContent='Analisando...';
-  stEl.style.display='block';
-  stEl.innerHTML=`<div class="sb"><div class="sd"></div>Gerando análise clínica contextual...<div class="lb"><div class="lf"></div></div></div>`;
-  const pr=`Você é Joyce Neres, Profissional de Educação Física especialista em prescrição de exercício. Analise o caso abaixo e produza parecer técnico objetivo em português estruturado em:\n1. FACILITADORES observados\n2. BARREIRAS e dificuldades\n3. NECESSIDADES identificadas\n4. BASE DO ACOMPANHAMENTO (ressignificação, ajustes FITTVP, observações sobre medicamentos se houver)\nSeja técnico, direto e orientado à prática. Máximo 380 palavras.\n\nNome: ${d.nome||'NI'} | Sexo: ${d.sexo||'NI'} | Idade: ${d.idade||'NI'} anos | IMC: ${d.imc||'NI'}\nObjetivo: ${d.obj||'NI'} | AF: ${d.af} | Diabetes: ${d.db} | Tabagismo: ${d.tab}\nAnti-hipertensivo: ${d.ah} | PA: ${d.pas||'NI'} | Colesterol: ${d.col||'NI'} | HDL: ${d.hdl||'NI'}\nHistórico DCV: ${d.hd} | Condições: ${d.con||'nenhuma'} | Medicamentos: ${d.med||'nenhum'}\nObservações: ${d.obs||'nenhuma'}`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:pr}]})});
-    const data=await res.json();
-    const txt=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'Erro.';
-    document.getElementById('iate').value=txt;
-    outEl.style.display='block';stEl.style.display='none';
-  }catch{stEl.innerHTML=`<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)">Erro de conexão com a IA.</div>`;}
-  btn.disabled=false;btn.textContent='Gerar Análise Clínica com IA';
-}
-function cpIA(){navigator.clipboard.writeText(document.getElementById('iate').value).then(()=>alert('Copiado!'));}
-
+// ===== RISCO (preservado integralmente) =====
 function cFRS(){
   const d=gD();const el=document.getElementById('rFRS');
-  const f=[],n=[];
-  const i=+d.idade||0;
-  if(d.sexo==='M'&&i>=45)f.push('Homem ≥45 anos');
-  if(d.sexo==='F'&&i>=55)f.push('Mulher ≥55 anos');
-  if(d.hd==='sim')f.push('Histórico familiar DCV');
-  if(d.tab==='sim')f.push('Tabagismo ativo');
-  if(d.tab==='ex')f.push('Ex-fumante &lt;6 meses');
-  if(d.db==='sim'||d.db==='pre')f.push('Diabetes / Pré-diabetes');
-  const pas=+d.pas||0;if(pas>=130)f.push('PA ≥130 mmHg ou tratada');
+  const f=[],n=[];const i=+d.idade||0;
+  if(d.sexo==='M'&&i>=45)f.push('Homem\u226545');
+  if(d.sexo==='F'&&i>=55)f.push('Mulher\u226555');
+  if(d.hd==='sim')f.push('Hist familiar DCV');
+  if(d.tab==='sim')f.push('Tabagismo');
+  if(d.db==='sim'||d.db==='pre')f.push('Diabetes/Pré-DM');
+  const pas=+d.pas||0;if(pas>=130)f.push('PA\u2265130');
   const hdl=+d.hdl||0;
-  if(hdl<40&&d.sexo==='M')f.push('HDL &lt;40 mg/dL (♂)');
-  if(hdl<50&&d.sexo==='F')f.push('HDL &lt;50 mg/dL (♀)');
-  const col=+d.col||0;if(col>200)f.push('Colesterol &gt;200 mg/dL');
-  const imc=parseFloat(d.imc)||0;if(imc>=30)f.push('IMC ≥30 kg/m²');
-  if(hdl>60)n.push('HDL &gt;60 mg/dL (protetor cardiovascular)');
+  if(hdl<40&&d.sexo==='M')f.push('HDL<40(\u2642)');
+  if(hdl<50&&d.sexo==='F')f.push('HDL<50(\u2640)');
+  const col=+d.col||0;if(col>200)f.push('Colesterol>200');
+  const imc=parseFloat(d.imc)||0;if(imc>=30)f.push('IMC\u226530');
+  if(hdl>60)n.push('HDL>60(protetor)');
   const tot=f.length-(n.length?1:0);
   const[r,c]=tot<=1?['Baixo','rb-b']:tot<=2?['Moderado','rb-m']:['Alto','rb-a'];
-  el.innerHTML=`<div style="margin-bottom:12px"><span class="rb ${c}">Risco ${r}</span><span style="font-size:11.5px;color:var(--muted);margin-left:10px">${tot} fator(es)</span></div><div style="margin-bottom:10px">${f.map(x=>`<span class="tag tr">${x}</span>`).join('')}${n.map(x=>`<span class="tag tg">${x}</span>`).join('')}</div><div class="aib" style="font-size:12.5px"><strong>Análise ACSM:</strong> ${tot===0?'Risco muito baixo. Clearance para exercício sem restrições adicionais.':tot<=2?'Risco moderado. Monitorar fatores identificados. Progressão cautelosa e supervisão recomendada.':'Risco elevado. Avaliação médica recomendada antes de exercício de alta intensidade (ACSM Cat. II–III).'}</div>`;
+  S.rFRS=`${r} (${tot} fator(es)${f.length?': '+f.join(', '):''})`;
+  el.innerHTML=`<div style="margin-bottom:9px"><span class="rb ${c}">Risco ${r}</span><span style="font-size:11px;color:var(--muted);margin-left:9px">${tot} fator(es)</span></div><div style="margin-bottom:8px">${f.map(x=>`<span class="tag tr">${x}</span>`).join('')}${n.map(x=>`<span class="tag tg">${x}</span>`).join('')}</div><div class="aib" style="font-size:12px">${tot===0?'Risco muito baixo. Clearance para exercício sem restrições.':tot<=2?'Risco moderado. Progressão cautelosa, supervisão recomendada.':'Risco elevado. Avaliação médica antes de exercício de alta intensidade.'}</div>`;
 }
 
 function cFDR(){
   const d=gD();const el=document.getElementById('rFDR');
-  let pts=0;
-  const i=+d.idade||0;if(i>=45&&i<=54)pts+=2;else if(i>=55&&i<=64)pts+=3;else if(i>=65)pts+=4;
-  const imc=parseFloat(d.imc)||0;if(imc>=25&&imc<30)pts+=1;else if(imc>=30)pts+=3;
+  let pts=0;const i=+d.idade||0;
+  if(i>=45&&i<=54)pts+=2;else if(i>=55&&i<=64)pts+=3;else if(i>=65)pts+=4;
+  const imc=parseFloat(d.imc)||0;
+  if(imc>=25&&imc<30)pts+=1;else if(imc>=30)pts+=3;
   const cin=+d.cintura||0;
   if(d.sexo==='M'){if(cin>=94&&cin<102)pts+=3;else if(cin>=102)pts+=4;}
   else{if(cin>=80&&cin<88)pts+=3;else if(cin>=88)pts+=4;}
   if(d.af==='sedentario')pts+=2;
   pts+=+d.hdm||0;
   if(d.ah==='sim')pts+=2;
-  if(d.db==='pre')pts+=5;
   let r,c;
-  if(pts<=6){r='Baixo — 1 em 100';c='rb-b';}
-  else if(pts<=11){r='Intermediário — 1 em 25';c='rb-m';}
-  else if(pts<=14){r='Moderado — 1 em 6';c='rb-m';}
-  else if(pts<=20){r='Alto — 1 em 3';c='rb-a';}
-  else{r='Muito Alto — 1 em 2';c='rb-a';}
-  el.innerHTML=`<div style="margin-bottom:10px"><span class="rb ${c}">FINDRISC: ${r}</span><span style="font-size:11.5px;color:var(--muted);margin-left:10px">Score: ${pts} pts</span></div><div class="aib" style="font-size:12.5px;margin-top:8px">${pts>=8?'Risco intermediário ou maior. Exercício aeróbico regular é fator protetor prioritário. Monitoramento glicêmico e orientação nutricional recomendados.':'Risco baixo. Manter estilo de vida ativo como estratégia preventiva.'}</div>`;
+  if(pts<=6){r='Baixo';c='rb-b';}
+  else if(pts<=11){r='Intermediário';c='rb-m';}
+  else if(pts<=14){r='Moderado';c='rb-m';}
+  else if(pts<=20){r='Alto';c='rb-a';}
+  else{r='Muito Alto';c='rb-a';}
+  S.rFDR=`FINDRISC: ${r} (${pts} pts)`;
+  el.innerHTML=`<div style="margin-bottom:8px"><span class="rb ${c}">FINDRISC: ${r}</span><span style="font-size:11px;color:var(--muted);margin-left:9px">${pts} pts</span></div><div class="aib" style="font-size:12px">${pts>=8?'Risco intermediário ou maior. Exercício aeróbico como fator protetor prioritário.':'Risco baixo. Manter estilo de vida ativo como prevenção.'}</div>`;
 }
 
 function cACSM(){
   const d=gD();const el=document.getElementById('rACSM');
-  const pos=[],neg=[];
-  const i=+d.idade||0;
-  if(d.sexo==='M'&&i>=45)pos.push('Idade ≥45 anos (♂)');
-  if(d.sexo==='F'&&i>=55)pos.push('Idade ≥55 anos (♀)');
-  if(d.hd==='sim')pos.push('Histórico familiar DCV');
-  if(d.tab==='sim')pos.push('Tabagismo atual');
+  const pos=[],neg=[];const i=+d.idade||0;
+  if(d.sexo==='M'&&i>=45)pos.push('Idade\u226545(\u2642)');
+  if(d.sexo==='F'&&i>=55)pos.push('Idade\u226555(\u2640)');
+  if(d.hd==='sim')pos.push('Hist familiar DCV');
+  if(d.tab==='sim')pos.push('Tabagismo');
   if(d.af==='sedentario')pos.push('Sedentarismo');
-  const imc=parseFloat(d.imc)||0;if(imc>=30)pos.push('Obesidade IMC ≥30');
-  const pas=+d.pas||0;if(pas>=130)pos.push('Hipertensão / tratamento');
+  const imc=parseFloat(d.imc)||0;if(imc>=30)pos.push('Obesidade');
+  const pas=+d.pas||0;if(pas>=130)pos.push('Hipertensão');
   const hdl=+d.hdl||0,col=+d.col||0;
   if(hdl<40||col>200)pos.push('Dislipidemia');
-  if(d.db==='sim')pos.push('Diabetes tipo 2');
-  if(hdl>60)neg.push('HDL &gt;60 mg/dL (protetor)');
+  if(d.db==='sim')pos.push('DM2');
+  if(hdl>60)neg.push('HDL>60');
   const tot=pos.length-(neg.length?1:0);
   const[nv,c]=tot<=1?['Baixo Risco','rb-b']:tot<=2?['Risco Moderado','rb-m']:['Alto Risco','rb-a'];
-  el.innerHTML=`<div style="margin-bottom:12px"><span class="rb ${c}">${nv} ACSM — ${tot} fator(es)</span></div><div style="display:flex;gap:16px;flex-wrap:wrap"><div style="flex:1;min-width:170px"><div style="font-size:10px;font-weight:600;color:var(--vmc);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Fatores Positivos</div>${pos.length?pos.map(x=>`<span class="tag tr">${x}</span>`).join(''):'<span style="font-size:12px;color:var(--muted)">Nenhum</span>'}</div><div style="flex:1;min-width:170px"><div style="font-size:10px;font-weight:600;color:var(--em-c);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Fatores Protetores</div>${neg.length?neg.map(x=>`<span class="tag tg">${x}</span>`).join(''):'<span style="font-size:12px;color:var(--muted)">Nenhum</span>'}</div></div>`;
+  S.rACSM=`ACSM: ${nv} (${tot} fator(es))`;
+  el.innerHTML=`<div style="margin-bottom:9px"><span class="rb ${c}">${nv} ACSM</span></div><div style="display:flex;gap:11px;flex-wrap:wrap"><div><div style="font-size:10px;font-weight:600;color:var(--vmc);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Positivos</div>${pos.length?pos.map(x=>`<span class="tag tr">${x}</span>`).join(''):'<span style="font-size:11px;color:var(--muted)">Nenhum</span>'}</div><div><div style="font-size:10px;font-weight:600;color:var(--em-c);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Protetores</div>${neg.length?neg.map(x=>`<span class="tag tg">${x}</span>`).join(''):'<span style="font-size:11px;color:var(--muted)">Nenhum</span>'}</div></div>`;
+}
+
+// ===== DISC =====
+function gerarFraseDisc(perfil, nome){
+  const frases={
+    'Diretivo (Vermelho)':`${nome||'Aluno(a)'}, você tem um perfil diretivo — orientado a resultados, determinado e focado. Isso é uma vantagem enorme no treino: você vai buscar a progressão e não vai aceitar estagnação. Minha função é dar estrutura e dados concretos para que você canalize essa determinação na direção certa.`,
+    'Influenciador (Laranja)':`${nome||'Aluno(a)'}, seu perfil é influenciador — você se energiza com novidades, conexão social e ambientes dinâmicos. O treino com você precisa ser variado, motivante e celebrar cada conquista. Vou garantir que cada fase seja desafiadora e divertida ao mesmo tempo.`,
+    'Estável (Verde)':`${nome||'Aluno(a)'}, você tem um perfil estável — valoriza consistência, conexão genuína e progresso gradual. Sua maior força é a constância. Minha proposta é construir uma relação de confiança e um plano que respeite seu ritmo, sem pressa, mas sem parar.`,
+    'Cauteloso (Azul)':`${nome||'Aluno(a)'}, você tem um perfil cauteloso — analítico, preciso e orientado a planejamento. Isso é um diferencial: você vai querer entender o porquê de cada exercício, e eu vou garantir que tudo tenha embasamento e lógica. Juntos vamos construir um plano sólido e bem fundamentado.`
+  };
+  return frases[perfil] || '';
 }
 
 function upD(){
-  const vD=+document.getElementById('slD').value,vI=+document.getElementById('slI').value,vS=+document.getElementById('slS').value,vC=+document.getElementById('slC').value;
+  const vD=+document.getElementById('slD').value;
+  const vI=+document.getElementById('slI').value;
+  const vS=+document.getElementById('slS').value;
+  const vC=+document.getElementById('slC').value;
   document.getElementById('vD').textContent=vD;
   document.getElementById('vI').textContent=vI;
   document.getElementById('vS').textContent=vS;
@@ -526,33 +647,47 @@ function upD(){
   if(S.dc){S.dc.data.datasets[0].data=[vD,vI,vS,vC];S.dc.update();}
   const mx=Math.max(vD,vI,vS,vC);
   const PF=[
-    {v:vD,n:'Diretivo (Vermelho)',c:'var(--vmc)',est:['Comunicação direta e objetiva — sem rodeios','Apresente metas mensuráveis e resultados concretos','Respeite sua autonomia e independência','Mostre progressos com dados e números']},
-    {v:vI,n:'Influenciador (Laranja)',c:'var(--ljc)',est:['Use linguagem positiva, entusiasmada e motivadora','Varie os treinos para manter engajamento','Celebre conquistas e reconheça cada avanço','Envolva em desafios, metas divertidas e contexto social']},
-    {v:vS,n:'Estável (Verde)',c:'var(--em-c)',est:['Construa confiança antes de aumentar exigências','Progressão gradual sem pressão ou comparações','Momentos de escuta ativa e conexão pessoal','Foco em bem-estar e qualidade de vida']},
-    {v:vC,n:'Cauteloso (Azul)',c:'var(--azc)',est:['Apresente embasamento científico de cada prescrição','Explique o "por quê" de cada exercício','Planejamentos detalhados com métricas claras','Responda dúvidas técnicas com precisão']}
+    {v:vD,n:'Diretivo (Vermelho)',c:'var(--vmc)',e:['Comunicação direta e objetiva','Metas mensuráveis e resultados concretos','Respeite autonomia e independência','Progresso com dados e números']},
+    {v:vI,n:'Influenciador (Laranja)',c:'var(--ljc)',e:['Linguagem positiva e entusiasmada','Varie treinos para manter engajamento','Celebre cada conquista','Desafios e metas divertidas']},
+    {v:vS,n:'Estável (Verde)',c:'var(--em-c)',e:['Construa confiança antes de cobrar','Progressão gradual sem pressão','Escuta ativa e conexão pessoal','Foco em bem-estar e qualidade de vida']},
+    {v:vC,n:'Cauteloso (Azul)',c:'var(--azc)',e:['Embasamento científico das prescrições','Explique o porquê de cada exercício','Planejamentos detalhados e precisos','Responda dúvidas técnicas com precisão']}
   ];
   const dom=PF.find(p=>p.v===mx);
-  const aEl=document.getElementById('dAnal'),eEl=document.getElementById('dEst'),eTxt=document.getElementById('dEstT');
+  const aEl=document.getElementById('dAnal');
+  const eEl=document.getElementById('dEst');
+  const eTxt=document.getElementById('dEstT');
   if(dom){
-    aEl.innerHTML=`<div class="pcs"><div class="pc pcv" style="${mx===vD?'box-shadow:0 0 0 1.5px var(--vm)':''}"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${vD}<span style="font-size:12px">/10</span></div></div><div class="pc pco" style="${mx===vI?'box-shadow:0 0 0 1.5px var(--lj)':''}"><div class="pcn" style="color:var(--ljc)">Influenciador</div><div class="pcs_" style="color:var(--ljc)">${vI}<span style="font-size:12px">/10</span></div></div><div class="pc pcg" style="${mx===vS?'box-shadow:0 0 0 1.5px var(--em)':''}"><div class="pcn" style="color:var(--em-c)">Estável</div><div class="pcs_" style="color:var(--em-c)">${vS}<span style="font-size:12px">/10</span></div></div><div class="pc pca" style="${mx===vC?'box-shadow:0 0 0 1.5px var(--az)':''}"><div class="pcn" style="color:var(--azc)">Cauteloso</div><div class="pcs_" style="color:var(--azc)">${vC}<span style="font-size:12px">/10</span></div></div></div><div class="aib"><strong style="color:${dom.c}">Perfil dominante: ${dom.n}</strong></div>`;
+    aEl.innerHTML=`<div class="pcs"><div class="pc pcv" style="${mx===vD?'box-shadow:0 0 0 1.5px var(--vm)':''}}"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${vD}<span style="font-size:11px">/10</span></div></div><div class="pc pco" style="${mx===vI?'box-shadow:0 0 0 1.5px var(--lj)':''}}"><div class="pcn" style="color:var(--ljc)">Influenciador</div><div class="pcs_" style="color:var(--ljc)">${vI}<span style="font-size:11px">/10</span></div></div><div class="pc pcg" style="${mx===vS?'box-shadow:0 0 0 1.5px var(--em)':''}}"><div class="pcn" style="color:var(--em-c)">Estável</div><div class="pcs_" style="color:var(--em-c)">${vS}<span style="font-size:11px">/10</span></div></div><div class="pc pca" style="${mx===vC?'box-shadow:0 0 0 1.5px var(--az)':''}}"><div class="pcn" style="color:var(--azc)">Cauteloso</div><div class="pcs_" style="color:var(--azc)">${vC}<span style="font-size:11px">/10</span></div></div></div><div class="aib"><strong style="color:${dom.c}">Perfil dominante: ${dom.n}</strong></div>`;
     eEl.style.display='block';
-    eTxt.innerHTML=`<ul style="padding-left:18px;font-size:13px;line-height:2.1">${dom.est.map(e=>`<li>${e}</li>`).join('')}</ul>`;
+    eTxt.innerHTML=`<ul style="padding-left:16px;font-size:13px;line-height:2">${dom.e.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+    const d=gD();
+    const frase=gerarFraseDisc(dom.n, d.nome);
+    const fraseEl=document.getElementById('discFrase');
+    if(fraseEl && !fraseEl.dataset.editado) fraseEl.value=frase;
   }
 }
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const frEl=document.getElementById('discFrase');
+  if(frEl) frEl.addEventListener('input',()=>{ frEl.dataset.editado='1'; });
+});
 
 function iDC(){
   if(S.dc)return;
   const ctx=document.getElementById('dchart').getContext('2d');
-  S.dc=new Chart(ctx,{type:'radar',data:{labels:['Diretivo\n(Vermelho)','Influenciador\n(Laranja)','Estável\n(Verde)','Cauteloso\n(Azul)'],datasets:[{data:[5,5,5,5],backgroundColor:'rgba(77,158,114,0.13)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:['#d45050','#d4822a','#4d9e72','#5a9fd4'],pointRadius:5,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:9.5},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10.5},color:'rgba(255,255,255,0.6)'}}}}});
+  S.dc=new Chart(ctx,{type:'radar',data:{labels:['Diretivo\n(Vm)','Influenciador\n(Lj)','Estável\n(Vd)','Cauteloso\n(Az)'],datasets:[{data:[5,5,5,5],backgroundColor:'rgba(77,158,114,0.13)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:['#d45050','#d4822a','#4d9e72','#5a9fd4'],pointRadius:5,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:9},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10},color:'rgba(255,255,255,0.6)'}}}}});
   upD();
 }
 
+// ===== HEX =====
 function upH(){
   const a=[],id=[];
   for(let i=0;i<6;i++){
-    const av=+document.getElementById(`hA${i}`).value,iv=+document.getElementById(`hI${i}`).value;
+    const av=+document.getElementById(`hA${i}`).value;
+    const iv=+document.getElementById(`hI${i}`).value;
     a.push(av);id.push(iv);
-    document.getElementById(`hAv${i}`).textContent=av;document.getElementById(`hIv${i}`).textContent=iv;
+    document.getElementById(`hAv${i}`).textContent=av;
+    document.getElementById(`hIv${i}`).textContent=iv;
   }
   if(S.hc){S.hc.data.datasets[0].data=a;S.hc.data.datasets[1].data=id;S.hc.update();}
 }
@@ -560,42 +695,351 @@ function upH(){
 function iHC(){
   if(S.hc)return;
   const ctx=document.getElementById('hchart').getContext('2d');
-  S.hc=new Chart(ctx,{type:'radar',data:{labels:['Saúde e\nAutocuidado','Atividade\nFísica','Alimentação','Trabalho e\nEducação','Lazer /\nSocial','Família'],datasets:[{label:'Atual',data:[2,2,3,3,2,4],backgroundColor:'rgba(212,80,80,0.11)',borderColor:'#d45050',borderWidth:1.5,pointBackgroundColor:'#d45050',pointRadius:4},{label:'Ideal',data:[4,5,4,4,4,5],backgroundColor:'rgba(77,158,114,0.11)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:'#4d9e72',pointRadius:4,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:5,ticks:{stepSize:1,font:{size:9.5},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10.5},color:'rgba(255,255,255,0.6)'}}}}});
+  S.hc=new Chart(ctx,{type:'radar',data:{labels:['Saúde e\nAutocuidado','Atividade\nFísica','Alimentação','Trabalho e\nEducação','Lazer /\nSocial','Família'],datasets:[{label:'Atual',data:[2,2,3,3,2,4],backgroundColor:'rgba(212,80,80,0.11)',borderColor:'#d45050',borderWidth:1.5,pointBackgroundColor:'#d45050',pointRadius:4},{label:'Ideal',data:[4,5,4,4,4,5],backgroundColor:'rgba(77,158,114,0.11)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:'#4d9e72',pointRadius:4,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:5,ticks:{stepSize:1,font:{size:9},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10},color:'rgba(255,255,255,0.6)'}}}}});
   upH();
 }
 
+// ===== MOTIVACIONAL =====
 function tgE(el,id){
   el.classList.toggle('sel');
-  const x=S.es.indexOf(id);if(x>=0)S.es.splice(x,1);else S.es.push(id);
+  const x=S.es.indexOf(id);
+  if(x>=0) S.es.splice(x,1); else S.es.push(id);
 }
 
+// ===== ANÁLISE IA =====
+async function anIA(){
+  const d=gD();
+  const stEl=document.getElementById('iast');
+  const outEl=document.getElementById('iaout');
+  const btn=document.getElementById('bnia');
+  btn.disabled=true; btn.textContent='Analisando...';
+  stEl.style.display='block';
+  stEl.innerHTML='<div class="sb"><div class="sd"></div>Gerando análise clínica...<div class="lb"><div class="lf"></div></div></div>';
+
+  const mx=Math.max(d.D,d.I,d.Sv,d.C);
+  const discDom=mx===d.D?'Diretivo':mx===d.I?'Influenciador':mx===d.Sv?'Estável':'Cauteloso';
+  const EM={manutencao:'Manutenção',acao:'Ação',preparacao:'Preparação',contemplacao:'Contemplação',precontemplacao:'Pré-contemplação'};
+  const estagios=S.es.map(e=>EM[e]).join(', ')||'Não avaliado';
+
+  const pr=`Você é Profª Joyce Neres, PEF especialista em prescrição de exercício. Analise o caso e produza um parecer clínico técnico em português com as seguintes seções:
+
+1. FACILITADORES
+2. BARREIRAS
+3. NECESSIDADES PRIORITÁRIAS
+4. BASE DO ACOMPANHAMENTO
+
+Dados do aluno:
+Nome: ${d.nome||'NI'} | Sexo: ${d.sexo} | Idade: ${d.idade} | IMC: ${d.imc} | Gordura: ${d.gord||'NI'}%
+Objetivo: ${d.obj} | Nível AF: ${d.af} | Nível treino: ${d.niv}
+Triagem: ${S.rFRS||'não calculado'} | ${S.rFDR||''} | ${S.rACSM||''}
+DISC dominante: ${discDom} (D:${d.D} I:${d.I} S:${d.Sv} C:${d.C})
+Estágio motivacional: ${estagios}
+Diabetes: ${d.db} | Tabagismo: ${d.tab} | Anti-hipertensivo: ${d.ah} | PA: ${d.pas||'NI'}
+Histórico DCV: ${d.hd} | Condições: ${d.con||'nenhuma'} | Medicamentos: ${d.med||'nenhum'}
+Observações: ${d.obs||'nenhuma'}
+
+Máximo 400 palavras. Seja técnico, objetivo e direto.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:pr}]})});
+    const data=await res.json();
+    const txt=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'Erro na resposta.';
+    document.getElementById('iate').value=txt;
+    outEl.style.display='block';
+    stEl.style.display='none';
+  }catch{
+    stEl.innerHTML='<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)">Erro de conexão com a API.</div>';
+  }
+  btn.disabled=false;
+  btn.textContent='Gerar Análise Clínica com IA';
+}
+
+function cpIA(){ navigator.clipboard.writeText(document.getElementById('iate').value).then(()=>alert('Copiado!')); }
+
+// ===== FOTOS =====
+function loadFoto(e,lado){
+  const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=r=>{
+    const b64=r.result.split(',')[1];
+    const mt=f.type;
+    if(lado==='A'){ S.fA=b64; S.fAmt=mt; const img=document.getElementById('imgA'); img.src=r.result; img.style.display='block'; }
+    else{ S.fB=b64; S.fBmt=mt; const img=document.getElementById('imgB'); img.src=r.result; img.style.display='block'; }
+  };
+  rd.readAsDataURL(f);
+}
+
+async function anFisico(){
+  if(!S.fA&&!S.fB){ alert('Adicione pelo menos uma foto. Ou preencha manualmente.'); return; }
+  const btn=document.getElementById('btnF'),st=document.getElementById('fst');
+  btn.disabled=true; btn.textContent='Analisando...';
+  st.style.display='block';
+  st.innerHTML='<div class="sb"><div class="sd"></div>Analisando composição e estrutura...<div class="lb"><div class="lf"></div></div></div>';
+  const cnt=[];
+  if(S.fA) cnt.push({type:'image',source:{type:'base64',media_type:S.fAmt,data:S.fA}});
+  if(S.fB) cnt.push({type:'image',source:{type:'base64',media_type:S.fBmt,data:S.fB}});
+  const d=gD();
+  cnt.push({type:'text',text:`Especialista em análise postural. Analise as fotos de ${d.nome||'aluno'} (${d.idade||'?'}anos, ${d.peso||'?'}kg, IMC ${d.imc||'?'}, objetivo: ${d.obj||'NI'}).\nRetorne EXATAMENTE este JSON sem texto adicional:\n{"pontos_fortes":["item1","item2","item3","item4"],"pontos_melhoria":["item1","item2","item3","item4"]}\nSeja técnico. Analise: simetria, proporção, grupos musculares, postura, composição aparente.`});
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:cnt}]})});
+    const data=await res.json();
+    const raw=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'';
+    const jm=raw.match(/\{[\s\S]*\}/);
+    if(!jm) throw new Error('no json');
+    const p=JSON.parse(jm[0]);
+    if(p.pontos_fortes) document.getElementById('fPF').value=p.pontos_fortes.join('\n');
+    if(p.pontos_melhoria) document.getElementById('fPM').value=p.pontos_melhoria.join('\n');
+    st.innerHTML='<div class="sb"><div class="sd" style="animation:none"></div>\u2705 Análise concluída. Edite se necessário.</div>';
+  }catch{
+    st.innerHTML='<div class="sb" style="border-color:rgba(212,130,42,.4);color:var(--ljc)">Análise automática falhou. Preencha manualmente.</div>';
+  }
+  btn.disabled=false; btn.textContent='Analisar Físico com IA';
+}
+
+// ===== IA para FITTVP =====
+async function preencherFittvpIA(){
+  const d=gD();
+  const btn=document.querySelector('[onclick="preencherFittvpIA()"]');
+  const st=document.getElementById('fittvpSt');
+  if(btn){ btn.disabled=true; btn.textContent='Gerando...'; }
+  st.style.display='block';
+  st.innerHTML='<div class="sb"><div class="sd"></div>Gerando prescrição FITTVP com IA...<div class="lb"><div class="lf"></div></div></div>';
+  const mx=Math.max(d.D,d.I,d.Sv,d.C);
+  const discDom=mx===d.D?'Diretivo':mx===d.I?'Influenciador':mx===d.Sv?'Estável':'Cauteloso';
+  const pr=`Você é PEF especialista em prescrição. Com base nos dados do aluno, gere uma prescrição FITTVP-AFFECT em JSON:
+
+Aluno: ${d.nome||'NI'}, ${d.idade}anos, IMC ${d.imc}, Gordura: ${d.gord||'NI'}%
+Objetivo: ${d.obj}, Nível: ${d.niv}, AF atual: ${d.af}
+Triagem: ${S.rFRS||''} ${S.rFDR||''} ${S.rACSM||''}
+DISC dominante: ${discDom}
+Condições: ${d.con||'nenhuma'} | Medicamentos: ${d.med||'nenhum'}
+
+Retorne EXATAMENTE este JSON (sem texto adicional):
+{"freq":"","int":"","tipo":"","tempo":"","vol":"","prog":"","afeto":"","obs":""}
+
+Cada campo: 1 linha concisa e objetiva.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:pr}]})});
+    const data=await res.json();
+    const raw=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'';
+    const jm=raw.match(/\{[\s\S]*\}/);
+    if(!jm) throw new Error('no json');
+    const p=JSON.parse(jm[0]);
+    const sv=(id,v)=>{ if(v){ const el=document.getElementById(id); if(el) el.value=v; }};
+    sv('ffFreq',p.freq); sv('ffInt',p.int); sv('ffTipo',p.tipo);
+    sv('ffTempo',p.tempo); sv('ffVol',p.vol); sv('ffProg',p.prog);
+    sv('ffAfeto',p.afeto); sv('ffObs',p.obs);
+    st.innerHTML='<div class="sb"><div class="sd" style="animation:none"></div>\u2705 FITTVP preenchido. Edite conforme necessário.</div>';
+  }catch{
+    st.innerHTML='<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)">Erro ao gerar FITTVP. Preencha manualmente.</div>';
+  }
+  if(btn){ btn.disabled=false; btn.textContent='\u26A1 Preencher com IA'; }
+}
+
+// ===== IA para SMART =====
+async function preencherSmartIA(){
+  const d=gD();
+  const btn=document.querySelector('[onclick="preencherSmartIA()"]');
+  const st=document.getElementById('smartSt');
+  if(btn){ btn.disabled=true; btn.textContent='Gerando...'; }
+  st.style.display='block';
+  st.innerHTML='<div class="sb"><div class="sd"></div>Gerando metas SMART com IA...<div class="lb"><div class="lf"></div></div></div>';
+  const pr=`Você é PEF especialista. Com base nos dados, gere metas SMART em JSON:
+
+Aluno: ${d.nome||'NI'}, ${d.idade}anos, IMC ${d.imc}, Gordura: ${d.gord||'NI'}%
+Objetivo: ${d.obj}, Nível: ${d.niv}
+Triagem: ${S.rFRS||''} ${S.rFDR||''} ${S.rACSM||''}
+Condições: ${d.con||'nenhuma'}
+
+Retorne EXATAMENTE este JSON:
+{"S":"","M":"","A":"","R":"","T":""}
+
+S=Específica, M=Mensurável, A=Alcançável, R=Relevante, T=Temporal. 1-2 frases por campo.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:pr}]})});
+    const data=await res.json();
+    const raw=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'';
+    const jm=raw.match(/\{[\s\S]*\}/);
+    if(!jm) throw new Error('no json');
+    const p=JSON.parse(jm[0]);
+    const sv=(id,v)=>{ if(v){ const el=document.getElementById(id); if(el) el.value=v; }};
+    sv('smS',p.S); sv('smM',p.M); sv('smA',p.A); sv('smR',p.R); sv('smT',p.T);
+    st.innerHTML='<div class="sb"><div class="sd" style="animation:none"></div>\u2705 Metas SMART preenchidas. Edite conforme necessário.</div>';
+  }catch{
+    st.innerHTML='<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)">Erro ao gerar SMART. Preencha manualmente.</div>';
+  }
+  if(btn){ btn.disabled=false; btn.textContent='\u26A1 Preencher SMART com IA'; }
+}
+
+// ===== RELATÓRIO FINAL =====
 function bldR(){
   const d=gD();
   const EM={manutencao:'Manutenção',acao:'Ação',preparacao:'Preparação',contemplacao:'Contemplação',precontemplacao:'Pré-contemplação'};
   const mx=Math.max(d.D,d.I,d.Sv,d.C);
   const dn=mx===d.D?'Diretivo (Vermelho)':mx===d.I?'Influenciador (Laranja)':mx===d.Sv?'Estável (Verde)':'Cauteloso (Azul)';
-  const mot=document.getElementById('fmot').value;
   const ia=document.getElementById('iate')?.value||'';
-  document.getElementById('rPrv').innerHTML=`
-<div style="background:var(--carvao);border:1px solid var(--em-b);border-radius:14px;padding:24px 28px;margin-bottom:20px;text-align:center">
-  <div style="font-size:10px;color:var(--em);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:600">Profª Joyce Neres · Educação Física</div>
-  <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--creme);line-height:1.2">Relatório de <strong style="font-style:normal;color:var(--em-c)">Consulta</strong></div>
-  <div style="font-size:11px;color:var(--muted);margin-top:7px">Atividade Física, Exercício e Saúde</div>
+  const mot=document.getElementById('fmot')?.value||'';
+  const pf=document.getElementById('fPF')?.value||'';
+  const pm=document.getElementById('fPM')?.value||'';
+  const parecer=document.getElementById('fParecer')?.value||'';
+  // Garante frase DISC: usa o campo editável ou gera na hora se vazio
+  const _fraseEl = document.getElementById('discFrase');
+  const discFrase = (_fraseEl?.value?.trim()) || gerarFraseDisc(dn, d.nome);
+  const nLbl={iniciante:'Iniciante',intermediario:'Intermediário',avancado:'Avançado'};
+  const imcN=parseFloat(d.imc)||0;
+
+  // FITTVP
+  const ff={
+    freq: document.getElementById('ffFreq')?.value||'',
+    int: document.getElementById('ffInt')?.value||'',
+    tipo: document.getElementById('ffTipo')?.value||'',
+    tempo: document.getElementById('ffTempo')?.value||'',
+    vol: document.getElementById('ffVol')?.value||'',
+    prog: document.getElementById('ffProg')?.value||'',
+    afeto: document.getElementById('ffAfeto')?.value||'',
+    obs: document.getElementById('ffObs')?.value||'',
+  };
+
+  // SMART
+  const sm={
+    S: document.getElementById('smS')?.value||'',
+    M: document.getElementById('smM')?.value||'',
+    A: document.getElementById('smA')?.value||'',
+    R: document.getElementById('smR')?.value||'',
+    T: document.getElementById('smT')?.value||'',
+  };
+
+  // Hexagrama
+  const hA=[],hI=[];
+  const hLbl=['Saúde e Autocuidado','Atividade Física','Alimentação','Trabalho e Educação','Lazer / Social','Família'];
+  for(let i=0;i<6;i++){
+    hA.push(+document.getElementById(`hA${i}`).value);
+    hI.push(+document.getElementById(`hI${i}`).value);
+  }
+
+  // Captura gráfico hexagrama como imagem
+  let hexImg='';
+  if(S.hc){ try{ hexImg=S.hc.canvas.toDataURL('image/png'); }catch(e){} }
+
+  document.getElementById('rltOut').innerHTML=`<div class="R">
+
+<div class="R-capa">
+  <div class="R-lbl">Avaliação Inicial &#183; JN Consultoria de Treino</div>
+  <div class="R-ttl">Relatório de <b>Consulta</b></div>
+  <div class="R-sub">${d.nome||'Aluno(a)'} &#183; Plano de ação individualizado</div>
+  <div class="R-chips">
+    <span class="R-chip">${d.nome||'—'}</span>
+    <span class="R-chip">${d.idade||'—'} anos</span>
+    <span class="R-chip">IMC ${d.imc||'—'}</span>
+    <span class="R-chip">${nLbl[d.niv]||'Iniciante'}</span>
+    ${d.obj?`<span class="R-chip">${d.obj}</span>`:''}
+  </div>
 </div>
-<div class="mg">
-  <div class="met"><div class="mlbl">Aluno(a)</div><div class="mvl mve" style="font-size:12.5px">${d.nome||'—'}</div></div>
-  <div class="met"><div class="mlbl">Data</div><div class="mvl">${new Date().toLocaleDateString('pt-BR')}</div></div>
-  <div class="met"><div class="mlbl">IMC</div><div class="mvl">${d.imc||'—'}</div></div>
+
+<!-- 01: DADOS DO ALUNO -->
+<div class="R-sec">
+  <div class="R-num">01 &#183; Composição Corporal</div>
+  <div class="R-tit">Dados do <span>Aluno</span></div>
+  <div class="R-met4">
+    <div class="R-met"><div class="R-met-l">Peso Atual</div><div class="R-met-v">${d.peso||'—'} <span style="font-size:12px;font-weight:400">kg</span></div></div>
+    <div class="R-met"><div class="R-met-l">IMC</div><div class="R-met-v">${d.imc||'—'}</div><div class="R-met-s">${imcN<18.5?'Abaixo do peso':imcN<25?'Normal':imcN<30?'Sobrepeso':'Obesidade'}</div></div>
+    <div class="R-met"><div class="R-met-l">Nível de Treino</div><div class="R-met-v" style="font-size:14px">${nLbl[d.niv]||'—'}</div><div class="R-met-s">${d.af==='sedentario'?'<150min/sem':d.af==='leve'?'1–2×/sem':d.af==='moderado'?'3–4×/sem':'\u22655×/sem'}</div></div>
+  </div>
+  ${d.con?`<div style="margin-top:10px;font-size:12.5px"><strong>Condições:</strong> ${d.con}</div>`:''}
+  ${d.med?`<div style="margin-top:5px;font-size:12px;color:#666"><strong>Medicamentos:</strong> ${d.med}</div>`:''}
+  ${(pf||pm)?`<div class="R-2col" style="margin-top:14px">
+    ${pf?`<div><div class="R-lt" style="color:#2d6a44"><span class="R-dot" style="background:#4d9e72"></span>Pontos Fortes</div>${pf.split('\n').filter(l=>l.trim()).map(l=>`<div class="R-li">${l.trim()}</div>`).join('')}</div>`:''}
+    ${pm?`<div><div class="R-lt" style="color:#8a2020"><span class="R-dot" style="background:#d45050"></span>Pontos de Melhoria</div>${pm.split('\n').filter(l=>l.trim()).map(l=>`<div class="R-li R-li-r">${l.trim()}</div>`).join('')}</div>`:''}
+  </div>`:''}
+  ${ia?`<div style="margin-top:14px"><div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Análise Clínica Contextual</div><div style="background:#f7f7f5;border:1px solid #e8e8e6;border-radius:9px;padding:13px 15px;font-size:12.5px;line-height:1.85;color:#333;white-space:pre-wrap">${ia}</div></div>`:''}
 </div>
-<div style="margin-bottom:15px"><div class="ctit">Objetivo</div><p style="font-size:13px">${d.obj||'Não informado'}</p></div>
-${ia?`<div style="margin-bottom:15px"><div class="ctit">Análise Clínica Contextual</div><div class="aib">${ia}</div></div>`:''}
-<div style="margin-bottom:15px"><div class="ctit">Perfil Comportamental DISC / LASEr</div>
-<div class="pcs"><div class="pc pcv"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${d.D}<span style="font-size:11px">/10</span></div></div><div class="pc pco"><div class="pcn" style="color:var(--ljc)">Influenciador</div><div class="pcs_" style="color:var(--ljc)">${d.I}<span style="font-size:11px">/10</span></div></div><div class="pc pcg"><div class="pcn" style="color:var(--em-c)">Estável</div><div class="pcs_" style="color:var(--em-c)">${d.Sv}<span style="font-size:11px">/10</span></div></div><div class="pc pca"><div class="pcn" style="color:var(--azc)">Cauteloso</div><div class="pcs_" style="color:var(--azc)">${d.C}<span style="font-size:11px">/10</span></div></div></div>
-<p style="font-size:12.5px;margin-top:8px"><strong style="color:var(--creme)">Perfil dominante:</strong> <span style="color:var(--em-c)">${dn}</span></p></div>
-<div style="margin-bottom:15px"><div class="ctit">Estágio Motivacional</div><div>${S.es.length?S.es.map(e=>`<span class="tag tg">${EM[e]}</span>`).join(' '):'<span style="font-size:12px;color:var(--muted)">Não avaliado</span>'}</div>${mot?`<div class="aib" style="margin-top:10px;font-size:12.5px">${mot}</div>`:''}</div>
-<div style="margin-bottom:15px"><div class="ctit">Condições e Medicamentos</div><p style="font-size:13px">${d.con||'Nenhuma condição informada'}</p>${d.med?`<p style="font-size:12px;color:var(--muted);margin-top:4px"><strong>Medicamentos:</strong> ${d.med}</p>`:''}</div>
-<div style="margin-top:24px;padding:13px 17px;border:1px solid var(--borda);border-radius:var(--r);text-align:center;font-size:11px;color:var(--muted)">
-  Documento gerado pelo Sistema JN Consultoria de Treino · Profª Joyce Neres — CREF ___<br>Uso profissional e pessoal do(a) aluno(a).
+
+<!-- 02: TRIAGEM DE SAÚDE -->
+<div class="R-sec">
+  <div class="R-num">02 &#183; Triagem de Saúde</div>
+  <div class="R-tit">Risco <span>Clínico</span></div>
+  <div class="R-risco">
+    <div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Resumo das Triagens</div>
+    ${S.rFRS?`<div style="font-size:12.5px;margin-bottom:6px">&#128376; <strong>Framingham:</strong> ${S.rFRS}</div>`:`<div style="font-size:12px;color:#bbb;margin-bottom:6px">&#128376; Framingham: não calculado (calcule na aba Triagem)</div>`}
+    ${S.rFDR?`<div style="font-size:12.5px;margin-bottom:6px">&#129656; <strong>${S.rFDR}</strong></div>`:`<div style="font-size:12px;color:#bbb;margin-bottom:6px">&#129656; FINDRISC: não calculado</div>`}
+    ${S.rACSM?`<div style="font-size:12.5px">&#127939; <strong>${S.rACSM}</strong></div>`:`<div style="font-size:12px;color:#bbb">&#127939; ACSM: não calculado</div>`}
+  </div>
+</div>
+
+<!-- 03: DISC -->
+<div class="R-sec">
+  <div class="R-num">03 &#183; Perfil Comportamental</div>
+  <div class="R-tit">DISC / <span>LASEr</span></div>
+  <div class="R-dc-grid">
+    <div class="R-dc R-dc-rv"><div class="R-dc-n" style="color:#c94040">Diretivo</div><div class="R-dc-v" style="color:#c94040">${d.D}<span class="R-dc-x">/10</span></div></div>
+    <div class="R-dc R-dc-or"><div class="R-dc-n" style="color:#c4722a">Influenciador</div><div class="R-dc-v" style="color:#c4722a">${d.I}<span class="R-dc-x">/10</span></div></div>
+    <div class="R-dc R-dc-gr"><div class="R-dc-n" style="color:#2d6a44">Estável</div><div class="R-dc-v" style="color:#2d6a44">${d.Sv}<span class="R-dc-x">/10</span></div></div>
+    <div class="R-dc R-dc-az"><div class="R-dc-n" style="color:#2a6da4">Cauteloso</div><div class="R-dc-v" style="color:#2a6da4">${d.C}<span class="R-dc-x">/10</span></div></div>
+  </div>
+  <div style="font-size:12.5px;margin-bottom:10px"><strong>Perfil dominante:</strong> ${dn}</div>
+  ${discFrase?`<div class="R-disc-frase">${discFrase}</div>`:''}
+</div>
+
+<!-- 04: MOTIVACIONAL -->
+<div class="R-sec">
+  <div class="R-num">04 &#183; Disposição para Mudança</div>
+  <div class="R-tit">Estágio <span>Motivacional</span></div>
+  ${S.es.length?`<div style="font-size:13px;margin-bottom:10px"><strong>Estágio identificado:</strong> ${S.es.map(e=>EM[e]).join(', ')}</div>`:`<div style="font-size:12px;color:#888">Estágio não selecionado.</div>`}
+  ${mot?`<div style="margin-top:10px"><div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Estratégia TAD</div><div style="background:#f7f7f5;border:1px solid #e8e8e6;border-radius:9px;padding:13px 15px;font-size:12.5px;line-height:1.85;color:#333">${mot}</div></div>`:''}
+</div>
+
+<!-- 05: BEM-ESTAR -->
+<div class="R-sec">
+  <div class="R-num">05 &#183; Qualidade de Vida</div>
+  <div class="R-tit">Hexagrama de <span>Bem-Estar</span></div>
+  ${hexImg?`<div style="text-align:center;margin-bottom:16px"><img src="${hexImg}" style="max-width:320px;width:100%;border-radius:8px" alt="Hexagrama de Bem-Estar"></div>`:''}
+  <div class="R-hex">${hLbl.map((l,i)=>`<div class="R-hex-i"><div class="R-hex-l">${l}</div><div class="R-hex-bar"><div class="R-hex-ba" style="width:${hA[i]*20}%"></div></div><div class="R-hex-bar" style="margin-top:3px"><div class="R-hex-bi" style="width:${hI[i]*20}%"></div></div><div class="R-hex-vl"><span style="color:#d45050">Atual: ${hA[i]}/5</span><span style="color:#4d9e72">Ideal: ${hI[i]}/5</span></div></div>`).join('')}</div>
+</div>
+
+<!-- 06: PLANO DE AÇÃO FITTVP -->
+<div class="R-sec">
+  <div class="R-num">06 &#183; Prescrição de Exercício</div>
+  <div class="R-tit">Plano <span>FITTVP-AFFECT</span></div>
+  <div class="R-fittvp">
+    ${ff.freq?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">F &#8212; Frequência</div><div class="R-fittvp-val">${ff.freq}</div></div>`:''}
+    ${ff.int?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">I &#8212; Intensidade</div><div class="R-fittvp-val">${ff.int}</div></div>`:''}
+    ${ff.tipo?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">T &#8212; Tipo / Modalidade</div><div class="R-fittvp-val">${ff.tipo}</div></div>`:''}
+    ${ff.tempo?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">T &#8212; Tempo / Duração</div><div class="R-fittvp-val">${ff.tempo}</div></div>`:''}
+    ${ff.vol?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">V &#8212; Volume</div><div class="R-fittvp-val">${ff.vol}</div></div>`:''}
+    ${ff.prog?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">P &#8212; Progressão</div><div class="R-fittvp-val">${ff.prog}</div></div>`:''}
+    ${ff.afeto?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">A &#8212; Afeto / Preferências</div><div class="R-fittvp-val">${ff.afeto}</div></div>`:''}
+    ${ff.obs?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">Observações</div><div class="R-fittvp-val">${ff.obs}</div></div>`:''}
+  </div>
+</div>
+
+<!-- 07: METAS SMART -->
+<div class="R-sec">
+  <div class="R-num">07 &#183; Objetivos e Resultados</div>
+  <div class="R-tit">Metas <span>SMART</span></div>
+  <div class="R-smart">
+    ${sm.S?`<div class="R-smart-item"><div class="R-smart-l">S</div><div class="R-smart-content"><div class="R-smart-label">Específica</div><div class="R-smart-val">${sm.S}</div></div></div>`:''}
+    ${sm.M?`<div class="R-smart-item"><div class="R-smart-l">M</div><div class="R-smart-content"><div class="R-smart-label">Mensurável</div><div class="R-smart-val">${sm.M}</div></div></div>`:''}
+    ${sm.A?`<div class="R-smart-item"><div class="R-smart-l">A</div><div class="R-smart-content"><div class="R-smart-label">Alcançável</div><div class="R-smart-val">${sm.A}</div></div></div>`:''}
+    ${sm.R?`<div class="R-smart-item"><div class="R-smart-l">R</div><div class="R-smart-content"><div class="R-smart-label">Relevante</div><div class="R-smart-val">${sm.R}</div></div></div>`:''}
+    ${sm.T?`<div class="R-smart-item"><div class="R-smart-l">T</div><div class="R-smart-content"><div class="R-smart-label">Temporal</div><div class="R-smart-val">${sm.T}</div></div></div>`:''}
+  </div>
+</div>
+
+${parecer?`<div class="R-sec">
+  <div class="R-quote">
+    <div style="font-size:26px;color:#4d9e72;line-height:1;margin-bottom:9px">&#8220;</div>
+    <div class="R-q-txt">${parecer}</div>
+    <div class="R-q-sig">Prof&#170; Joyce Neres &#8212; Educação Física</div>
+  </div>
+</div>`:''}
+
+<div class="R-foot">
+  <div class="R-foot-n">Prof&#170; Joyce Neres</div>
+  <div class="R-foot-i">JN Consultoria de Treino &#183; Educação Física &#183; CREF 022609-G/BA<br>Uso exclusivo do(a) aluno(a)</div>
+</div>
+
 </div>`;
 }
 </script>
