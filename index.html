@@ -462,16 +462,16 @@ function gT(i){
   if(i===7) bldR();
 }
 
-// ===== PDF.JS UPLOAD (client-side, sem API) =====
+// ===== PDF.JS UPLOAD — formato Google Forms (resposta na linha após o label) =====
 async function upld(e){
   const f=e.target.files[0]; if(!f) return;
   const uz=document.getElementById('uz'), st=document.getElementById('ust');
   st.style.display='block';
-  st.innerHTML='<div class="sb"><div class="sd"></div>Lendo PDF localmente...<div class="lb"><div class="lf"></div></div></div>';
+  st.innerHTML='<div class="sb"><div class="sd"></div>Lendo PDF...<div class="lb"><div class="lf"></div></div></div>';
   uz.querySelector('.uz-ttl').textContent='\u2705 '+f.name;
 
   if(f.type!=='application/pdf'){
-    st.innerHTML='<div class="sb" style="border-color:rgba(212,130,42,.4);color:var(--ljc)"><div class="sd" style="background:var(--lj);animation:none"></div>Apenas PDF suportado. Preencha manualmente.</div>';
+    st.innerHTML='<div class="sb" style="border-color:rgba(212,130,42,.4);color:var(--ljc)"><div class="sd" style="background:var(--lj);animation:none"></div>Apenas PDF suportado.</div>';
     return;
   }
 
@@ -479,44 +479,102 @@ async function upld(e){
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     const ab = await f.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({data: new Uint8Array(ab)}).promise;
+
+    // Extrai preservando quebras de linha (crítico para Google Forms)
     let txt='';
     for(let p=1;p<=pdf.numPages;p++){
       const pg = await pdf.getPage(p);
       const content = await pg.getTextContent();
-      txt += content.items.map(it=>it.str).join(' ') + ' ';
+      let lastY=null, linha='';
+      content.items.forEach(it=>{
+        const y=it.transform[5];
+        if(lastY!==null && Math.abs(y-lastY)>3){ txt+=linha.trim()+'\n'; linha=''; }
+        linha+=(linha?' ':'')+it.str;
+        lastY=y;
+      });
+      if(linha.trim()) txt+=linha.trim()+'\n';
+      txt+='\n';
     }
 
-    const sv=(id,v)=>{ if(v!=null&&v!==''){ const el=document.getElementById(id); if(el) el.value=v; }};
+    // Extrator: Google Forms coloca a resposta na linha APÓS o label
+    // Pula URLs, numeração de página (\d+/\d+) e linhas com só *
+    function extrair(labels){
+      for(const lbl of labels){
+        const esc=lbl.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        const re=new RegExp(esc+'[^\\n]*\\n(?:(?:https?://\\S+|\\d+\\/\\d+|\\s*\\*?\\s*)\\n)*\\s*([^\\n]{2,})', 'i');
+        const m=txt.match(re);
+        if(m){
+          const v=m[1].trim();
+          if(!v.startsWith('http')&&!/^\d+\/\d+$/.test(v)) return v;
+        }
+      }
+      return null;
+    }
 
-    // Regex patterns robustos
-    let m;
-    m=txt.match(/(?:Nome|Atleta|Nome completo)[:\s]+([A-Za-z\u00C0-\u00FF\s]{4,50}?)(?=\s*(?:Sexo|Gênero|Idade|Data|\d|$))/i);
-    if(m) sv('fn',m[1].trim());
+    const sv=(id,v)=>{ if(v){ const el=document.getElementById(id); if(el) el.value=v; }};
 
-    m=txt.match(/(?:Idade|Anos)[:\s]+(\d{2})(?:\s*anos)?/i);
-    if(m) sv('fi2',m[1]);
+    // ── DADOS PESSOAIS ──
+    sv('fn', extrair(['NOME COMPLETO','Nome completo']));
+    sv('fi2', extrair(['Idade']));
 
-    m=txt.match(/(?:Peso|Massa corporal)[:\s]*(\d{2,3}(?:[.,]\d)?)/i);
-    if(m) sv('fp',m[1].replace(',','.'));
+    const pesoRaw = extrair(['Peso']);
+    if(pesoRaw){ sv('fp', pesoRaw.replace(',','.')); }
 
-    m=txt.match(/(?:Altura)[:\s]*(\d{1,3}(?:[.,]\d{1,2})?)/i);
-    if(m){ let h=parseFloat(m[1].replace(',','.')); if(h<3)h*=100; sv('fh',h); }
+    const altRaw = extrair(['Altura']);
+    if(altRaw){ let h=parseFloat(altRaw.replace(',','.')); if(h<3)h*=100; sv('fh',String(h)); }
 
-    m=txt.match(/(?:Sexo|Gênero)[:\s]*(Masculino|Feminino|\bM\b|\bF\b)/i);
-    if(m){ const s=m[1].trim().toLowerCase(); sv('fs', s.startsWith('f')?'F':'M'); }
+    // ── SAÚDE ──
+    const histFam = extrair(['Indique o seu hist','histórico familiar de doenças']);
+    if(histFam && !/^n[aã]o$/i.test(histFam.trim())){
+      // Se mencionar HAS → histórico DCV sim
+      if(/HAS|cardíac|infart|AVC/i.test(histFam)){
+        const el=document.getElementById('fhd'); if(el) el.value='sim';
+      }
+      // Se mencionar DM → hist DM
+      if(/DM|diabet/i.test(histFam)){
+        const el=document.getElementById('fhdm'); if(el) el.value='3';
+      }
+    }
 
-    m=txt.match(/(?:Objetivo|Meta principal|Objetivo Principal)[:\s]+([^.\n]{4,80})/i);
-    if(m) sv('fobj',m[1].trim());
+    const condicao = extrair(['Alguma condição médica pré-existente']);
+    if(condicao && !/^n[aã]o$/i.test(condicao.trim())) sv('fcon', condicao);
 
-    m=txt.match(/(?:Medicamento|Medicação|Remédio)[:\s]+([^.\n]{2,100})/i);
-    if(m) sv('fmed',m[1].trim());
+    const med = extrair(['Você usa medicamentos','usa medicamentos']);
+    if(med && !/^n[aã]o$/i.test(med.trim())) sv('fmed', med);
 
-    m=txt.match(/(?:Condições|Lesões|Diagnóstico)[:\s]+([^.\n]{4,150})/i);
-    if(m) sv('fcon',m[1].trim());
+    const fuma = extrair(['Fuma']);
+    if(fuma){
+      const el=document.getElementById('ftab');
+      if(el) el.value=/^n[aã]o$/i.test(fuma.trim())?'nao':'sim';
+    }
+
+    // ── OBJETIVO ──
+    // Google Forms: objetivos são checkboxes — captura a opção "Outro:"
+    const outroObj = txt.match(/Outro:\s*([^\n]{4,120})/i);
+    if(outroObj) sv('fobj', outroObj[1].trim());
+    else {
+      // Fallback: pega os checkboxes marcados como objetivos
+      const objBlock = txt.match(/objetivos com a pr[aá]tica de exerc[ií]cio[^\n]*\n([\s\S]{0,300}?)(?:Qual experi|DADOS)/i);
+      if(objBlock){
+        const itens = objBlock[1].split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('http')&&!/^\d+\/\d+$/.test(l));
+        if(itens.length) sv('fobj', itens.join(', '));
+      }
+    }
+
+    // ── OBSERVAÇÕES (rotina, parte do corpo, disponibilidade) ──
+    const rotina = extrair(['Descreva sua atividade diária']);
+    const parteCorpo = extrair(['Qual parte do corpo mais lhe incomoda']);
+    const disponibilidade = extrair(['Qual sua disponibilidade para fazer exercícios']);
+    const obsArr = [rotina, parteCorpo && 'Foco: '+parteCorpo, disponibilidade && 'Disponibilidade: '+disponibilidade].filter(Boolean);
+    if(obsArr.length) sv('fobs', obsArr.join(' | '));
 
     cIMC();
-    const filled=['fn','fi2','fp','fh','fobj'].filter(id=>document.getElementById(id)?.value).length;
-    st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>\u2705 ${filled} campos extraídos. Revise e complete o restante.</div>`;
+
+    // Conta campos preenchidos
+    const campos=['fn','fi2','fp','fh','fobj'];
+    const filled=campos.filter(id=>{ const el=document.getElementById(id); return el&&el.value; }).length;
+    st.innerHTML=`<div class="sb"><div class="sd" style="animation:none"></div>\u2705 ${filled}/${campos.length} campos principais preenchidos. Verifique e complete o restante.</div>`;
+
   }catch(err){
     st.innerHTML='<div class="sb" style="border-color:rgba(212,80,80,.4);color:var(--vmc)"><div class="sd" style="background:var(--vm);animation:none"></div>\u26A0 Erro ao ler PDF. Preencha manualmente.</div>';
     console.error(err);
