@@ -244,7 +244,7 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 <div class="card">
   <div class="ctit">Preencher Automaticamente</div>
   <div class="csub">Cole o texto estruturado da anamnese abaixo e clique em preencher. Os dados serão distribuídos em todos os campos do sistema automaticamente.</div>
-  <textarea id="txtColar" style="min-height:140px;font-size:12px;font-family:monospace;letter-spacing:.2px" placeholder="NOME: Vitória Cardoso&#10;SEXO: F&#10;IDADE: 27&#10;PESO: 73&#10;ALTURA: 167&#10;OBJETIVO: Emagrecimento sem perda de massa muscular&#10;NIVEL_TREINO: intermediario&#10;DIABETES: nao&#10;TABAGISMO: nao&#10;ANTIHIPERTENSIVO: nao&#10;HISTORICO_DCV: nao&#10;HISTORICO_DM: 3&#10;ATIVIDADE_FISICA: moderado&#10;CONDICOES: Nenhuma&#10;MEDICAMENTOS: Não&#10;OBSERVACOES: Pratica musculação, dorme mal...&#10;DISC_D: 7&#10;DISC_I: 4&#10;DISC_S: 5&#10;DISC_C: 6&#10;ESTAGIO: preparacao&#10;BEM_ESTAR_SAUDE: 2/4&#10;BEM_ESTAR_AF: 3/5&#10;BEM_ESTAR_ALIMENTACAO: 3/4&#10;BEM_ESTAR_TRABALHO: 2/4&#10;BEM_ESTAR_LAZER: 2/4&#10;BEM_ESTAR_FAMILIA: 4/5"></textarea>
+  <textarea id="txtColar" style="min-height:140px;font-size:12px;font-family:monospace;letter-spacing:.2px" placeholder="NOME: Vitória Cardoso&#10;SEXO: F&#10;IDADE: 27&#10;PESO: 73&#10;ALTURA: 167&#10;OBJETIVO: Emagrecimento sem perda de massa muscular&#10;NIVEL_TREINO: intermediario&#10;DIABETES: nao&#10;TABAGISMO: nao&#10;ANTIHIPERTENSIVO: nao&#10;HISTORICO_DCV: nao&#10;HISTORICO_DM: 3&#10;ATIVIDADE_FISICA: moderado&#10;CONDICOES: Nenhuma&#10;MEDICAMENTOS: Não&#10;OBSERVACOES: Pratica musculação, dorme mal...&#10;DISC_DIRETIVO: 2&#10;DISC_ANALISADOR: 5&#10;DISC_PROMOTOR: 1&#10;DISC_APOIADOR: 2&#10;ESTAGIO: preparacao&#10;BEM_ESTAR_SAUDE: 2/4&#10;BEM_ESTAR_AF: 3/5&#10;BEM_ESTAR_ALIMENTACAO: 3/4&#10;BEM_ESTAR_TRABALHO: 2/4&#10;BEM_ESTAR_LAZER: 2/4&#10;BEM_ESTAR_FAMILIA: 4/5"></textarea>
   <div class="brow" style="margin-top:10px">
     <button class="btn bp" onclick="preencherAuto()">&#9889; Preencher Automaticamente</button>
     <button class="btn bg" onclick="document.getElementById('txtColar').value=''">Limpar</button>
@@ -295,10 +295,10 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 <div class="card">
   <div class="csub">Classifique 0&#8211;10 por dimensão com base na entrevista. Método DISC / LASEr.</div>
   <div class="disc-grid">
-    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--vmc)">&#128308; Diretivo</span><span class="dg-vl" style="color:var(--vmc)" id="vD">5</span></div><input type="range" min="0" max="10" value="5" id="slD" oninput="upD()" style="accent-color:var(--vm)"><div class="dg-d">Confiante &#183; Líder &#183; Focado em resultados</div><div class="dg-nd">Necessidade: Reconhecimento</div></div>
-    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--ljc)">&#127825; Influenciador</span><span class="dg-vl" style="color:var(--ljc)" id="vI">5</span></div><input type="range" min="0" max="10" value="5" id="slI" oninput="upD()" style="accent-color:var(--lj)"><div class="dg-d">Divertido &#183; Social &#183; Explorador</div><div class="dg-nd">Necessidade: Experiência e novidade</div></div>
-    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--em-c)">&#129001; Estável</span><span class="dg-vl" style="color:var(--em-c)" id="vS">5</span></div><input type="range" min="0" max="10" value="5" id="slS" oninput="upD()" style="accent-color:var(--em)"><div class="dg-d">Meigo &#183; Apoiador &#183; Harmonioso</div><div class="dg-nd">Necessidade: Conexão e pertencimento</div></div>
-    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--azc)">&#128309; Cauteloso</span><span class="dg-vl" style="color:var(--azc)" id="vC">5</span></div><input type="range" min="0" max="10" value="5" id="slC" oninput="upD()" style="accent-color:var(--az)"><div class="dg-d">Analítico &#183; Detalhista &#183; Planejador</div><div class="dg-nd">Necessidade: Segurança e controle</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--vmc)">&#128308; Diretivo</span><span class="dg-vl" style="color:var(--vmc)" id="vD">5</span></div><input type="range" min="0" max="10" value="5" id="slD" oninput="upD()" style="accent-color:var(--vm)"><div class="dg-d">Confiante &#183; Líder &#183; Focado em resultados</div><div class="dg-nd">Necessidade: Controle e resultados</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--ljc)">&#127825; Analisador</span><span class="dg-vl" style="color:var(--ljc)" id="vI">5</span></div><input type="range" min="0" max="10" value="5" id="slI" oninput="upD()" style="accent-color:var(--lj)"><div class="dg-d">Metódico &#183; Detalhista &#183; Planejador</div><div class="dg-nd">Necessidade: Segurança e precisão</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--em-c)">&#129001; Promotor</span><span class="dg-vl" style="color:var(--em-c)" id="vS">5</span></div><input type="range" min="0" max="10" value="5" id="slS" oninput="upD()" style="accent-color:var(--em)"><div class="dg-d">Entusiasta &#183; Social &#183; Criativo</div><div class="dg-nd">Necessidade: Reconhecimento e variedade</div></div>
+    <div class="dg"><div class="dg-h"><span class="dg-nm" style="color:var(--azc)">&#128309; Apoiador</span><span class="dg-vl" style="color:var(--azc)" id="vC">5</span></div><input type="range" min="0" max="10" value="5" id="slC" oninput="upD()" style="accent-color:var(--az)"><div class="dg-d">Harmonioso &#183; Colaborativo &#183; Empático</div><div class="dg-nd">Necessidade: Conexão e pertencimento</div></div>
   </div>
   <div class="cw" style="height:225px;margin-top:18px"><canvas id="dchart"></canvas></div>
   <hr class="div"><div id="dAnal"></div>
@@ -700,11 +700,12 @@ function cACSM(){
 
 // ===== DISC =====
 function gerarFraseDisc(perfil, nome){
+  const n=nome||'Aluno(a)';
   const frases={
-    'Diretivo (Vermelho)':`${nome||'Aluno(a)'}, você tem um perfil diretivo — orientado a resultados, determinado e focado. Isso é uma vantagem enorme no treino: você vai buscar a progressão e não vai aceitar estagnação. Minha função é dar estrutura e dados concretos para que você canalize essa determinação na direção certa.`,
-    'Influenciador (Laranja)':`${nome||'Aluno(a)'}, seu perfil é influenciador — você se energiza com novidades, conexão social e ambientes dinâmicos. O treino com você precisa ser variado, motivante e celebrar cada conquista. Vou garantir que cada fase seja desafiadora e divertida ao mesmo tempo.`,
-    'Estável (Verde)':`${nome||'Aluno(a)'}, você tem um perfil estável — valoriza consistência, conexão genuína e progresso gradual. Sua maior força é a constância. Minha proposta é construir uma relação de confiança e um plano que respeite seu ritmo, sem pressa, mas sem parar.`,
-    'Cauteloso (Azul)':`${nome||'Aluno(a)'}, você tem um perfil cauteloso — analítico, preciso e orientado a planejamento. Isso é um diferencial: você vai querer entender o porquê de cada exercício, e eu vou garantir que tudo tenha embasamento e lógica. Juntos vamos construir um plano sólido e bem fundamentado.`
+    'Diretivo':`${n}, seu perfil é Diretivo — você age com foco, clareza e quer ver resultado. Isso é um diferencial enorme: não há espaço para enrolação. Minha abordagem com você vai ser direta, com metas claras, progressão visível e dados que comprovem a evolução. Cada treino vai ter propósito definido.`,
+    'Analisador':`${n}, seu perfil é Analisador — você precisa entender o porquê antes de confiar no processo. Isso é uma força: você não desiste por impulso, você questiona e aprofunda. Vou te dar a fundamentação técnica de cada escolha, um plano detalhado e critérios claros de progressão. Você vai saber exatamente o que está fazendo e por quê.`,
+    'Promotor':`${n}, seu perfil é Promotor — você se move pela energia, pela novidade e pelo estímulo. Treino monótono não é para você. Vou garantir variedade, desafios que te animem e celebração de cada conquista. O processo precisa ser dinâmico para você se manter engajada(o) — e vai ser.`,
+    'Apoiador':`${n}, seu perfil é Apoiador — você valoriza harmonia, ritmo próprio e uma relação de confiança genuína. Não vou te pressionar ou cobrar resultados de forma agressiva. Minha proposta é construir consistência com cuidado, respeitando sua rotina e fortalecendo sua autonomia ao longo do processo.`
   };
   return frases[perfil] || '';
 }
@@ -721,17 +722,17 @@ function upD(){
   if(S.dc){S.dc.data.datasets[0].data=[vD,vI,vS,vC];S.dc.update();}
   const mx=Math.max(vD,vI,vS,vC);
   const PF=[
-    {v:vD,n:'Diretivo (Vermelho)',c:'var(--vmc)',e:['Comunicação direta e objetiva','Metas mensuráveis e resultados concretos','Respeite autonomia e independência','Progresso com dados e números']},
-    {v:vI,n:'Influenciador (Laranja)',c:'var(--ljc)',e:['Linguagem positiva e entusiasmada','Varie treinos para manter engajamento','Celebre cada conquista','Desafios e metas divertidas']},
-    {v:vS,n:'Estável (Verde)',c:'var(--em-c)',e:['Construa confiança antes de cobrar','Progressão gradual sem pressão','Escuta ativa e conexão pessoal','Foco em bem-estar e qualidade de vida']},
-    {v:vC,n:'Cauteloso (Azul)',c:'var(--azc)',e:['Embasamento científico das prescrições','Explique o porquê de cada exercício','Planejamentos detalhados e precisos','Responda dúvidas técnicas com precisão']}
+    {v:vD,n:'Diretivo',c:'var(--vmc)',e:['Comunicação direta, objetiva e sem rodeios','Metas com métricas claras e prazos definidos','Respeite a autonomia — evite micro gerenciar','Mostre dados e progressão de forma concreta']},
+    {v:vI,n:'Analisador',c:'var(--ljc)',e:['Explique o embasamento técnico de cada decisão','Forneça planejamento detalhado e critérios de progressão','Responda dúvidas com precisão e fundamento científico','Evite mudanças bruscas sem justificativa clara']},
+    {v:vS,n:'Promotor',c:'var(--em-c)',e:['Varie os estímulos e desafios com frequência','Celebre conquistas de forma entusiasmada','Use linguagem positiva e ambiente dinâmico','Crie metas que gerem empolgação e senso de novidade']},
+    {v:vC,n:'Apoiador',c:'var(--azc)',e:['Construa confiança antes de aumentar a exigência','Progressão gradual, sem pressão excessiva','Escuta ativa e acolhimento genuíno','Ambiente tranquilo, foco no bem-estar e qualidade de vida']}
   ];
   const dom=PF.find(p=>p.v===mx);
   const aEl=document.getElementById('dAnal');
   const eEl=document.getElementById('dEst');
   const eTxt=document.getElementById('dEstT');
   if(dom){
-    aEl.innerHTML=`<div class="pcs"><div class="pc pcv" style="${mx===vD?'box-shadow:0 0 0 1.5px var(--vm)':''}}"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${vD}<span style="font-size:11px">/10</span></div></div><div class="pc pco" style="${mx===vI?'box-shadow:0 0 0 1.5px var(--lj)':''}}"><div class="pcn" style="color:var(--ljc)">Influenciador</div><div class="pcs_" style="color:var(--ljc)">${vI}<span style="font-size:11px">/10</span></div></div><div class="pc pcg" style="${mx===vS?'box-shadow:0 0 0 1.5px var(--em)':''}}"><div class="pcn" style="color:var(--em-c)">Estável</div><div class="pcs_" style="color:var(--em-c)">${vS}<span style="font-size:11px">/10</span></div></div><div class="pc pca" style="${mx===vC?'box-shadow:0 0 0 1.5px var(--az)':''}}"><div class="pcn" style="color:var(--azc)">Cauteloso</div><div class="pcs_" style="color:var(--azc)">${vC}<span style="font-size:11px">/10</span></div></div></div><div class="aib"><strong style="color:${dom.c}">Perfil dominante: ${dom.n}</strong></div>`;
+    aEl.innerHTML=`<div class="pcs"><div class="pc pcv" style="${mx===vD?'box-shadow:0 0 0 1.5px var(--vm)':''}"><div class="pcn" style="color:var(--vmc)">Diretivo</div><div class="pcs_" style="color:var(--vmc)">${vD}<span style="font-size:11px">/10</span></div></div><div class="pc pco" style="${mx===vI?'box-shadow:0 0 0 1.5px var(--lj)':''}"><div class="pcn" style="color:var(--ljc)">Analisador</div><div class="pcs_" style="color:var(--ljc)">${vI}<span style="font-size:11px">/10</span></div></div><div class="pc pcg" style="${mx===vS?'box-shadow:0 0 0 1.5px var(--em)':''}"><div class="pcn" style="color:var(--em-c)">Promotor</div><div class="pcs_" style="color:var(--em-c)">${vS}<span style="font-size:11px">/10</span></div></div><div class="pc pca" style="${mx===vC?'box-shadow:0 0 0 1.5px var(--az)':''}"><div class="pcn" style="color:var(--azc)">Apoiador</div><div class="pcs_" style="color:var(--azc)">${vC}<span style="font-size:11px">/10</span></div></div></div><div class="aib"><strong style="color:${dom.c}">Perfil dominante: ${dom.n}</strong></div>`;
     eEl.style.display='block';
     eTxt.innerHTML=`<ul style="padding-left:16px;font-size:13px;line-height:2">${dom.e.map(x=>`<li>${x}</li>`).join('')}</ul>`;
     const d=gD();
@@ -749,7 +750,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 function iDC(){
   if(S.dc)return;
   const ctx=document.getElementById('dchart').getContext('2d');
-  S.dc=new Chart(ctx,{type:'radar',data:{labels:['Diretivo\n(Vm)','Influenciador\n(Lj)','Estável\n(Vd)','Cauteloso\n(Az)'],datasets:[{data:[5,5,5,5],backgroundColor:'rgba(77,158,114,0.13)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:['#d45050','#d4822a','#4d9e72','#5a9fd4'],pointRadius:5,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:9},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10},color:'rgba(255,255,255,0.6)'}}}}});
+  S.dc=new Chart(ctx,{type:'radar',data:{labels:['Diretivo','Analisador','Promotor','Apoiador'],datasets:[{data:[5,5,5,5],backgroundColor:'rgba(77,158,114,0.13)',borderColor:'#4d9e72',borderWidth:1.5,pointBackgroundColor:['#d45050','#d4822a','#4d9e72','#5a9fd4'],pointRadius:5,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:9},color:'rgba(255,255,255,0.3)',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10},color:'rgba(255,255,255,0.6)'}}}}});
   upD();
 }
 
@@ -791,7 +792,7 @@ async function anIA(){
   stEl.innerHTML='<div class="sb"><div class="sd"></div>Gerando análise clínica...<div class="lb"><div class="lf"></div></div></div>';
 
   const mx=Math.max(d.D,d.I,d.Sv,d.C);
-  const discDom=mx===d.D?'Diretivo':mx===d.I?'Influenciador':mx===d.Sv?'Estável':'Cauteloso';
+  const discDom=mx===d.D?'Diretivo':mx===d.I?'Analisador':mx===d.Sv?'Promotor':'Apoiador';
   const EM={manutencao:'Manutenção',acao:'Ação',preparacao:'Preparação',contemplacao:'Contemplação',precontemplacao:'Pré-contemplação'};
   const estagios=S.es.map(e=>EM[e]).join(', ')||'Não avaliado';
 
@@ -879,7 +880,7 @@ async function preencherFittvpIA(){
   st.style.display='block';
   st.innerHTML='<div class="sb"><div class="sd"></div>Gerando prescrição FITTVP com IA...<div class="lb"><div class="lf"></div></div></div>';
   const mx=Math.max(d.D,d.I,d.Sv,d.C);
-  const discDom=mx===d.D?'Diretivo':mx===d.I?'Influenciador':mx===d.Sv?'Estável':'Cauteloso';
+  const discDom=mx===d.D?'Diretivo':mx===d.I?'Analisador':mx===d.Sv?'Promotor':'Apoiador';
   const pr=`Você é PEF especialista em prescrição. Com base nos dados do aluno, gere uma prescrição FITTVP-AFFECT em JSON:
 
 Aluno: ${d.nome||'NI'}, ${d.idade}anos, IMC ${d.imc}, Gordura: ${d.gord||'NI'}%
@@ -952,7 +953,7 @@ function bldR(){
   const d=gD();
   const EM={manutencao:'Manutenção',acao:'Ação',preparacao:'Preparação',contemplacao:'Contemplação',precontemplacao:'Pré-contemplação'};
   const mx=Math.max(d.D,d.I,d.Sv,d.C);
-  const dn=mx===d.D?'Diretivo (Vermelho)':mx===d.I?'Influenciador (Laranja)':mx===d.Sv?'Estável (Verde)':'Cauteloso (Azul)';
+  const dn=mx===d.D?'Diretivo':mx===d.I?'Analisador':mx===d.Sv?'Promotor':'Apoiador';
   const ia=document.getElementById('iate')?.value||'';
   const mot=document.getElementById('fmot')?.value||'';
   const pf=document.getElementById('fPF')?.value||'';
@@ -1048,9 +1049,9 @@ function bldR(){
   <div class="R-tit">DISC / <span>LASEr</span></div>
   <div class="R-dc-grid">
     <div class="R-dc R-dc-rv"><div class="R-dc-n" style="color:#c94040">Diretivo</div><div class="R-dc-v" style="color:#c94040">${d.D}<span class="R-dc-x">/10</span></div></div>
-    <div class="R-dc R-dc-or"><div class="R-dc-n" style="color:#c4722a">Influenciador</div><div class="R-dc-v" style="color:#c4722a">${d.I}<span class="R-dc-x">/10</span></div></div>
-    <div class="R-dc R-dc-gr"><div class="R-dc-n" style="color:#2d6a44">Estável</div><div class="R-dc-v" style="color:#2d6a44">${d.Sv}<span class="R-dc-x">/10</span></div></div>
-    <div class="R-dc R-dc-az"><div class="R-dc-n" style="color:#2a6da4">Cauteloso</div><div class="R-dc-v" style="color:#2a6da4">${d.C}<span class="R-dc-x">/10</span></div></div>
+    <div class="R-dc R-dc-or"><div class="R-dc-n" style="color:#c4722a">Analisador</div><div class="R-dc-v" style="color:#c4722a">${d.I}<span class="R-dc-x">/10</span></div></div>
+    <div class="R-dc R-dc-gr"><div class="R-dc-n" style="color:#2d6a44">Promotor</div><div class="R-dc-v" style="color:#2d6a44">${d.Sv}<span class="R-dc-x">/10</span></div></div>
+    <div class="R-dc R-dc-az"><div class="R-dc-n" style="color:#2a6da4">Apoiador</div><div class="R-dc-v" style="color:#2a6da4">${d.C}<span class="R-dc-x">/10</span></div></div>
   </div>
   <div style="font-size:12.5px;margin-bottom:10px"><strong>Perfil dominante:</strong> ${dn}</div>
   ${discFrase?`<div class="R-disc-frase">${discFrase}</div>`:''}
@@ -1162,14 +1163,22 @@ function preencherAuto(){
 
   cIMC();
 
-  // ── DISC ──
-  const dD=get('DISC_D'), dI=get('DISC_I'), dS=get('DISC_S'), dC=get('DISC_C');
-  if(dD||dI||dS||dC){
-    if(dD){const el=document.getElementById('slD');if(el){el.value=dD;document.getElementById('vD').textContent=dD;}}
-    if(dI){const el=document.getElementById('slI');if(el){el.value=dI;document.getElementById('vI').textContent=dI;}}
-    if(dS){const el=document.getElementById('slS');if(el){el.value=dS;document.getElementById('vS').textContent=dS;}}
-    if(dC){const el=document.getElementById('slC');if(el){el.value=dC;document.getElementById('vC').textContent=dC;}}
-    if(S.dc){S.dc.data.datasets[0].data=[+(dD||5),+(dI||5),+(dS||5),+(dC||5)];S.dc.update();}
+  // ── DISC — aceita pontos brutos (ex: 5 de 10) ou escala direta ──
+  const dDir=get('DISC_DIRETIVO')||get('DISC_D');
+  const dAna=get('DISC_ANALISADOR')||get('DISC_I');
+  const dPro=get('DISC_PROMOTOR')||get('DISC_S');
+  const dApo=get('DISC_APOIADOR')||get('DISC_C');
+  if(dDir||dAna||dPro||dApo){
+    // Converte pontos brutos para escala 0-10 se soma > 10
+    const raw=[+(dDir||0),+(dAna||0),+(dPro||0),+(dApo||0)];
+    const soma=raw.reduce((a,b)=>a+b,0);
+    const vals=soma>10 ? raw.map(v=>Math.round(v/soma*10)) : raw;
+    const ids=['slD','slI','slS','slC'], vids=['vD','vI','vS','vC'];
+    vals.forEach((v,i)=>{
+      const el=document.getElementById(ids[i]);
+      if(el){el.value=v;document.getElementById(vids[i]).textContent=v;}
+    });
+    if(S.dc){S.dc.data.datasets[0].data=vals;S.dc.update();}
     preenchidos++;
   }
 
