@@ -6,7 +6,8 @@
 <title>Profª Joyce Neres — Sistema de Consulta</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -196,52 +197,30 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 .R-smart-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
 .R-smart-val{font-size:12.5px;color:#111}
 .R-disc-frase{background:#f0f7f3;border-left:3px solid #4d9e72;padding:14px 16px;border-radius:0 8px 8px 0;font-style:italic;font-size:13px;color:#333;line-height:1.7;margin-top:12px}
-.R.pdf-export{border-radius:0!important;overflow:hidden!important;width:794px!important;max-width:794px!important;box-sizing:border-box!important;font-size:15px!important;line-height:1.6!important;position:relative!important;left:0!important;margin:0!important}
+.R.pdf-export{border-radius:0!important;overflow:visible!important;width:794px!important;max-width:794px!important;box-sizing:border-box!important;font-size:15px!important;line-height:1.6!important;margin:0!important;padding:0!important;background:#fff!important}
 .R.pdf-export .R-capa,.R.pdf-export .R-foot{border-radius:0!important}
 .R.pdf-export .R-capa::after{display:none!important}
 .R.pdf-export .R-capa{padding:40px 32px 34px!important;overflow:hidden!important}
-.R.pdf-export .R-foot{margin:0!important;padding:20px 32px!important;width:100%!important;box-sizing:border-box!important}
+.R.pdf-export .R-foot{margin:0!important;padding:22px 32px!important;width:794px!important;max-width:794px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
+.R.pdf-export .R-sec{padding:24px 32px!important;box-sizing:border-box!important;border-bottom:1px solid #ebebeb!important}
+.R.pdf-export .pdf-chunk{padding:24px 32px!important;box-sizing:border-box!important;background:#fff!important}
 .R.pdf-export .R-lbl{font-size:12px!important}
-.R.pdf-export .R-ttl{font-size:36px!important}
-.R.pdf-export .R-sub{font-size:14px!important;margin-bottom:16px!important}
-.R.pdf-export .R-chip{font-size:13px!important;padding:5px 13px!important}
-.R.pdf-export .R-sec{padding:26px 32px!important;box-sizing:border-box!important}
+.R.pdf-export .R-ttl{font-size:34px!important}
+.R.pdf-export .R-sub{font-size:14px!important}
+.R.pdf-export .R-chip{font-size:13px!important}
 .R.pdf-export .R-num{font-size:13px!important}
-.R.pdf-export .R-tit{font-size:24px!important;margin-bottom:14px!important}
-.R.pdf-export .R-met4{grid-template-columns:repeat(3,1fr)!important;gap:10px!important}
-.R.pdf-export .R-met{padding:13px 14px!important}
+.R.pdf-export .R-tit{font-size:23px!important}
 .R.pdf-export .R-met-l{font-size:12px!important}
-.R.pdf-export .R-met-v{font-size:22px!important}
-.R.pdf-export .R-met-s{font-size:13px!important}
-.R.pdf-export .R-2col{grid-template-columns:1fr 1fr!important;gap:14px!important}
-.R.pdf-export .R-lt{font-size:12px!important}
-.R.pdf-export .R-li{font-size:14px!important;line-height:1.55!important;margin-bottom:8px!important}
-.R.pdf-export .R-dc-grid{grid-template-columns:repeat(4,1fr)!important;gap:9px!important}
-.R.pdf-export .R-dc{padding:12px 10px!important}
-.R.pdf-export .R-dc-n{font-size:12px!important}
-.R.pdf-export .R-dc-v{font-size:28px!important}
-.R.pdf-export .R-hex{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
-.R.pdf-export .R-hex-l{font-size:12px!important}
-.R.pdf-export .R-hex-vl{font-size:12px!important}
-.R.pdf-export .R-fittvp{grid-template-columns:1fr 1fr!important;gap:10px!important}
-.R.pdf-export .R-fittvp-lbl{font-size:12px!important}
-.R.pdf-export .R-fittvp-val{font-size:14px!important;line-height:1.5!important}
-.R.pdf-export .R-smart-item{padding:12px 14px!important}
-.R.pdf-export .R-smart-l{font-size:20px!important}
-.R.pdf-export .R-smart-label{font-size:12px!important}
-.R.pdf-export .R-smart-val{font-size:14px!important;line-height:1.5!important}
-.R.pdf-export .R-disc-frase{font-size:14px!important;line-height:1.6!important}
-.R.pdf-export .R-risco{padding:14px 16px!important;font-size:14px!important}
-.R.pdf-export .R-quote{padding:22px 28px!important;border-radius:0!important;margin:0!important}
-.R.pdf-export .R-q-txt{font-size:17px!important;line-height:1.6!important}
-.R.pdf-export .R-q-sig{font-size:12px!important}
+.R.pdf-export .R-met-v{font-size:21px!important}
+.R.pdf-export .R-li{font-size:14px!important;line-height:1.55!important}
+.R.pdf-export .R-fittvp-val,.R.pdf-export .R-smart-val{font-size:14px!important;line-height:1.5!important}
+.R.pdf-export .R-disc-frase{font-size:14px!important}
+.R.pdf-export .R-q-txt{font-size:17px!important}
 .R.pdf-export .R-foot-n{font-size:17px!important}
 .R.pdf-export .R-foot-i{font-size:12px!important;color:#888!important}
-.R.pdf-export .R-sec>div[style*="font-size"]{font-size:14px!important;line-height:1.55!important}
-.R.pdf-export .R-sec div[style*="font-size:11px"]{font-size:12px!important}
-.R.pdf-export .R-sec div[style*="font-size:26px"]{font-size:28px!important}
-.R.pdf-export img{max-width:100%!important;width:auto!important;display:block!important;margin:0 auto 14px!important}
-.R.pdf-export *{box-sizing:border-box!important;max-width:100%!important}
+.R.pdf-export .R-quote{border-radius:0!important;margin:0!important}
+.R.pdf-export img{max-width:100%!important;height:auto!important;display:block!important;margin:0 auto 12px!important}
+#pdf-staging{position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-9999;opacity:0;pointer-events:none}
 .no-print{display:block}
 @media print{
   @page{size:A4;margin:0}
@@ -506,6 +485,7 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 </div>
 
 </div><!-- end .app -->
+<div id="pdf-staging"></div>
 
 <script>
 "use strict";
@@ -1246,60 +1226,138 @@ function carregarDadosPadrao(){
   gT(7);
 }
 
-// ===== SALVAR PDF (sem cabeçalhos do navegador) =====
-const PDF_W=794; // largura A4 em px (210mm @ 96dpi)
+// ===== SALVAR PDF (jsPDF + html2canvas, bloco a bloco) =====
+const PDF_W=794;
 
-function prepararPDF(el){
-  el.classList.add('pdf-export');
-  el.style.width=PDF_W+'px';
-  el.style.maxWidth=PDF_W+'px';
-  el.style.margin='0';
-  el.style.left='0';
+function mkSec(children){
+  const s=document.createElement('div');
+  s.className='R-sec pdf-chunk';
+  children.forEach(c=>s.appendChild(c));
+  return s;
 }
 
-function limparPDF(el,wrapper){
-  el.classList.remove('pdf-export');
-  el.style.width='';
-  el.style.maxWidth='';
-  el.style.margin='';
-  el.style.left='';
-  if(wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+function buildPDFChunks(source){
+  const chunks=[];
+  source.querySelectorAll(':scope > *').forEach(el=>{
+    if(el.classList.contains('R-capa')||el.classList.contains('R-foot')){
+      chunks.push(el.cloneNode(true));
+      return;
+    }
+    if(!el.classList.contains('R-sec')) return;
+
+    const smart=el.querySelectorAll('.R-smart-item');
+    const fittvp=el.querySelectorAll('.R-fittvp-item');
+    const col2=el.querySelector('.R-2col');
+
+    if(smart.length>1){
+      const hdr=[];
+      el.childNodes.forEach(ch=>{ if(ch.nodeType===1&&!ch.classList.contains('R-smart')) hdr.push(ch.cloneNode(true)); });
+      if(hdr.length) chunks.push(mkSec(hdr));
+      for(let i=0;i<smart.length;i+=2){
+        const g=document.createElement('div'); g.className='R-smart';
+        g.appendChild(smart[i].cloneNode(true));
+        if(smart[i+1]) g.appendChild(smart[i+1].cloneNode(true));
+        chunks.push(mkSec([g]));
+      }
+      return;
+    }
+    if(fittvp.length>2){
+      const hdr=[];
+      el.childNodes.forEach(ch=>{ if(ch.nodeType===1&&!ch.classList.contains('R-fittvp')) hdr.push(ch.cloneNode(true)); });
+      if(hdr.length) chunks.push(mkSec(hdr));
+      for(let i=0;i<fittvp.length;i+=2){
+        const g=document.createElement('div'); g.className='R-fittvp';
+        g.appendChild(fittvp[i].cloneNode(true));
+        if(fittvp[i+1]) g.appendChild(fittvp[i+1].cloneNode(true));
+        chunks.push(mkSec([g]));
+      }
+      return;
+    }
+    if(col2){
+      const hdr=[];
+      el.childNodes.forEach(ch=>{ if(ch.nodeType===1&&!ch.classList.contains('R-2col')) hdr.push(ch.cloneNode(true)); });
+      if(hdr.length) chunks.push(mkSec(hdr));
+      col2.querySelectorAll(':scope > div').forEach(col=>{
+        const w=document.createElement('div'); w.className='R-2col'; w.style.gridTemplateColumns='1fr';
+        w.appendChild(col.cloneNode(true));
+        chunks.push(mkSec([w]));
+      });
+      return;
+    }
+    chunks.push(el.cloneNode(true));
+  });
+  return chunks;
+}
+
+async function renderChunkCanvas(staging, chunk){
+  staging.innerHTML='';
+  const box=document.createElement('div');
+  box.className='R pdf-export';
+  if(chunk.classList.contains('R-foot')){
+    box.appendChild(chunk.cloneNode(true));
+  }else if(chunk.classList.contains('R-capa')){
+    box.appendChild(chunk.cloneNode(true));
+  }else{
+    box.appendChild(chunk.cloneNode(true));
+  }
+  staging.appendChild(box);
+  await document.fonts.ready;
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  return html2canvas(box,{scale:2,useCORS:true,backgroundColor:'#ffffff',width:PDF_W,windowWidth:PDF_W,scrollX:0,scrollY:0,logging:false});
+}
+
+function addCanvasToPDF(pdf,canvas,pageW,pageH,state){
+  const imgW=pageW;
+  const imgH=(canvas.height/canvas.width)*imgW;
+  const sliceHpx=(pageH/imgW)*canvas.width;
+  let y=0;
+  while(y<canvas.height){
+    const h=Math.min(sliceHpx,canvas.height-y);
+    const slice=document.createElement('canvas');
+    slice.width=canvas.width; slice.height=h;
+    const ctx=slice.getContext('2d');
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,slice.width,h);
+    ctx.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
+    const data=slice.toDataURL('image/jpeg',0.92);
+    const renderH=(h/canvas.width)*imgW;
+    if(!state.first) pdf.addPage();
+    else state.first=false;
+    pdf.addImage(data,'JPEG',0,0,imgW,renderH);
+    y+=h;
+  }
 }
 
 async function salvarPDF(){
   const btn=document.getElementById('btnPDF');
-  const orig=document.querySelector('#rltOut .R');
-  if(!orig){ alert('Clique em "Atualizar Relatório" antes de salvar o PDF.'); return; }
+  if(!document.querySelector('#rltOut .R')){ alert('Clique em "Atualizar Relatório" antes de salvar o PDF.'); return; }
   bldR();
   const source=document.querySelector('#rltOut .R');
   if(!source) return;
   const nome=(document.getElementById('fn')?.value||'aluno').replace(/\s+/g,'_');
+  const staging=document.getElementById('pdf-staging');
   if(btn){ btn.disabled=true; btn.textContent='Gerando PDF...'; }
 
-  const wrapper=document.createElement('div');
-  wrapper.style.cssText='position:fixed;left:0;top:0;width:'+PDF_W+'px;background:#fff;z-index:-1;opacity:0;pointer-events:none;overflow:hidden';
-  const clone=source.cloneNode(true);
-  wrapper.appendChild(clone);
-  document.body.appendChild(wrapper);
-  prepararPDF(clone);
-  await new Promise(r=>setTimeout(r,250));
-
   try{
-    await html2pdf().set({
-      margin:0,
-      filename:`Relatorio_Consulta_${nome}.pdf`,
-      image:{type:'jpeg',quality:0.95},
-      html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',width:PDF_W,scrollX:0,scrollY:0},
-      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-      pagebreak:{mode:['css','legacy']}
-    }).from(clone).save();
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+    const pageW=pdf.internal.pageSize.getWidth();
+    const pageH=pdf.internal.pageSize.getHeight();
+    const state={first:true};
+    const chunks=buildPDFChunks(source);
+
+    for(const chunk of chunks){
+      const canvas=await renderChunkCanvas(staging,chunk);
+      addCanvasToPDF(pdf,canvas,pageW,pageH,state);
+    }
+    pdf.save(`Relatorio_Consulta_${nome}.pdf`);
   }catch(e){
     console.error(e);
     alert('Não foi possível gerar o PDF. Tente novamente.');
   }finally{
-    limparPDF(clone,wrapper);
+    staging.innerHTML='';
+    if(btn){ btn.disabled=false; btn.innerHTML='&#128424; Salvar PDF'; }
   }
-  if(btn){ btn.disabled=false; btn.innerHTML='&#128424; Salvar PDF'; }
 }
 
 function preencherAuto(){
