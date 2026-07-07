@@ -196,51 +196,52 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 .R-smart-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
 .R-smart-val{font-size:12.5px;color:#111}
 .R-disc-frase{background:#f0f7f3;border-left:3px solid #4d9e72;padding:14px 16px;border-radius:0 8px 8px 0;font-style:italic;font-size:13px;color:#333;line-height:1.7;margin-top:12px}
-.R.pdf-export{border-radius:0!important;overflow:visible!important;width:492px!important;max-width:492px!important;font-size:17px!important;line-height:1.65!important}
+.R.pdf-export{border-radius:0!important;overflow:hidden!important;width:794px!important;max-width:794px!important;box-sizing:border-box!important;font-size:15px!important;line-height:1.6!important;position:relative!important;left:0!important;margin:0!important}
 .R.pdf-export .R-capa,.R.pdf-export .R-foot{border-radius:0!important}
-.R.pdf-export .R-capa{padding:36px 24px 32px!important}
-.R.pdf-export .R-foot{margin:0!important;padding:20px 24px!important;width:100%!important}
-.R.pdf-export .R-lbl{font-size:13px!important}
-.R.pdf-export .R-ttl{font-size:38px!important}
-.R.pdf-export .R-sub{font-size:15px!important;margin-bottom:16px!important}
-.R.pdf-export .R-chip{font-size:14px!important;padding:6px 14px!important}
-.R.pdf-export .R-sec{padding:24px 22px!important}
-.R.pdf-export .R-num{font-size:14px!important}
-.R.pdf-export .R-tit{font-size:26px!important;margin-bottom:14px!important}
-.R.pdf-export .R-met4{grid-template-columns:1fr!important;gap:10px!important}
-.R.pdf-export .R-met{padding:14px 16px!important}
-.R.pdf-export .R-met-l{font-size:13px!important}
-.R.pdf-export .R-met-v{font-size:24px!important}
-.R.pdf-export .R-met-s{font-size:14px!important}
-.R.pdf-export .R-2col{grid-template-columns:1fr!important;gap:16px!important}
-.R.pdf-export .R-lt{font-size:14px!important}
-.R.pdf-export .R-li{font-size:16px!important;line-height:1.6!important;margin-bottom:9px!important}
-.R.pdf-export .R-dc-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
-.R.pdf-export .R-dc{padding:14px 12px!important}
-.R.pdf-export .R-dc-n{font-size:13px!important}
-.R.pdf-export .R-dc-v{font-size:30px!important}
-.R.pdf-export .R-hex{grid-template-columns:1fr!important;gap:10px!important}
-.R.pdf-export .R-hex-l{font-size:13px!important}
-.R.pdf-export .R-hex-vl{font-size:13px!important}
-.R.pdf-export .R-hex-bar{height:7px!important}
-.R.pdf-export .R-fittvp{grid-template-columns:1fr!important;gap:10px!important}
-.R.pdf-export .R-fittvp-lbl{font-size:13px!important}
-.R.pdf-export .R-fittvp-val{font-size:16px!important;line-height:1.55!important}
-.R.pdf-export .R-smart-item{padding:14px 16px!important}
-.R.pdf-export .R-smart-l{font-size:22px!important}
-.R.pdf-export .R-smart-label{font-size:13px!important}
-.R.pdf-export .R-smart-val{font-size:16px!important;line-height:1.55!important}
-.R.pdf-export .R-disc-frase{font-size:16px!important;line-height:1.65!important;padding:16px 18px!important}
-.R.pdf-export .R-risco{padding:16px 18px!important;font-size:16px!important}
-.R.pdf-export .R-quote{padding:22px 22px!important;border-radius:0!important}
-.R.pdf-export .R-q-txt{font-size:18px!important;line-height:1.65!important}
-.R.pdf-export .R-q-sig{font-size:13px!important}
-.R.pdf-export .R-foot-n{font-size:18px!important}
-.R.pdf-export .R-foot-i{font-size:13px!important;color:#888!important}
-.R.pdf-export .R-sec div[style*="font-size"]{font-size:16px!important;line-height:1.6!important}
-.R.pdf-export .R-sec div[style*="font-size:11px"]{font-size:13px!important}
-.R.pdf-export .R-sec div[style*="font-size:26px"]{font-size:32px!important}
-.R.pdf-export img{max-width:100%!important;width:100%!important}
+.R.pdf-export .R-capa::after{display:none!important}
+.R.pdf-export .R-capa{padding:40px 32px 34px!important;overflow:hidden!important}
+.R.pdf-export .R-foot{margin:0!important;padding:20px 32px!important;width:100%!important;box-sizing:border-box!important}
+.R.pdf-export .R-lbl{font-size:12px!important}
+.R.pdf-export .R-ttl{font-size:36px!important}
+.R.pdf-export .R-sub{font-size:14px!important;margin-bottom:16px!important}
+.R.pdf-export .R-chip{font-size:13px!important;padding:5px 13px!important}
+.R.pdf-export .R-sec{padding:26px 32px!important;box-sizing:border-box!important}
+.R.pdf-export .R-num{font-size:13px!important}
+.R.pdf-export .R-tit{font-size:24px!important;margin-bottom:14px!important}
+.R.pdf-export .R-met4{grid-template-columns:repeat(3,1fr)!important;gap:10px!important}
+.R.pdf-export .R-met{padding:13px 14px!important}
+.R.pdf-export .R-met-l{font-size:12px!important}
+.R.pdf-export .R-met-v{font-size:22px!important}
+.R.pdf-export .R-met-s{font-size:13px!important}
+.R.pdf-export .R-2col{grid-template-columns:1fr 1fr!important;gap:14px!important}
+.R.pdf-export .R-lt{font-size:12px!important}
+.R.pdf-export .R-li{font-size:14px!important;line-height:1.55!important;margin-bottom:8px!important}
+.R.pdf-export .R-dc-grid{grid-template-columns:repeat(4,1fr)!important;gap:9px!important}
+.R.pdf-export .R-dc{padding:12px 10px!important}
+.R.pdf-export .R-dc-n{font-size:12px!important}
+.R.pdf-export .R-dc-v{font-size:28px!important}
+.R.pdf-export .R-hex{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
+.R.pdf-export .R-hex-l{font-size:12px!important}
+.R.pdf-export .R-hex-vl{font-size:12px!important}
+.R.pdf-export .R-fittvp{grid-template-columns:1fr 1fr!important;gap:10px!important}
+.R.pdf-export .R-fittvp-lbl{font-size:12px!important}
+.R.pdf-export .R-fittvp-val{font-size:14px!important;line-height:1.5!important}
+.R.pdf-export .R-smart-item{padding:12px 14px!important}
+.R.pdf-export .R-smart-l{font-size:20px!important}
+.R.pdf-export .R-smart-label{font-size:12px!important}
+.R.pdf-export .R-smart-val{font-size:14px!important;line-height:1.5!important}
+.R.pdf-export .R-disc-frase{font-size:14px!important;line-height:1.6!important}
+.R.pdf-export .R-risco{padding:14px 16px!important;font-size:14px!important}
+.R.pdf-export .R-quote{padding:22px 28px!important;border-radius:0!important;margin:0!important}
+.R.pdf-export .R-q-txt{font-size:17px!important;line-height:1.6!important}
+.R.pdf-export .R-q-sig{font-size:12px!important}
+.R.pdf-export .R-foot-n{font-size:17px!important}
+.R.pdf-export .R-foot-i{font-size:12px!important;color:#888!important}
+.R.pdf-export .R-sec>div[style*="font-size"]{font-size:14px!important;line-height:1.55!important}
+.R.pdf-export .R-sec div[style*="font-size:11px"]{font-size:12px!important}
+.R.pdf-export .R-sec div[style*="font-size:26px"]{font-size:28px!important}
+.R.pdf-export img{max-width:100%!important;width:auto!important;display:block!important;margin:0 auto 14px!important}
+.R.pdf-export *{box-sizing:border-box!important;max-width:100%!important}
 .no-print{display:block}
 @media print{
   @page{size:A4;margin:0}
@@ -1246,55 +1247,57 @@ function carregarDadosPadrao(){
 }
 
 // ===== SALVAR PDF (sem cabeçalhos do navegador) =====
-const PDF_W=492; // ~130mm — largura otimizada para leitura no celular
-const PDF_FMT=[130,230]; // mm — página estreita, texto maior ao abrir no mobile
+const PDF_W=794; // largura A4 em px (210mm @ 96dpi)
 
-function prepararPDF(rel){
-  rel.classList.add('pdf-export');
-  rel.style.width=PDF_W+'px';
-  rel._pdfRestore=[];
-  rel.querySelectorAll('[style*="font-size"]').forEach(el=>{
-    if(!el.style.fontSize) return;
-    rel._pdfRestore.push([el,'fontSize',el.style.fontSize]);
-    const px=parseFloat(el.style.fontSize);
-    if(px) el.style.fontSize=Math.round(px*1.25)+'px';
-  });
+function prepararPDF(el){
+  el.classList.add('pdf-export');
+  el.style.width=PDF_W+'px';
+  el.style.maxWidth=PDF_W+'px';
+  el.style.margin='0';
+  el.style.left='0';
 }
 
-function limparPDF(rel){
-  rel.classList.remove('pdf-export');
-  rel.style.width='';
-  if(rel._pdfRestore){
-    rel._pdfRestore.forEach(([el,prop,val])=>{ el.style[prop]=val; });
-    rel._pdfRestore=null;
-  }
+function limparPDF(el,wrapper){
+  el.classList.remove('pdf-export');
+  el.style.width='';
+  el.style.maxWidth='';
+  el.style.margin='';
+  el.style.left='';
+  if(wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
 }
 
 async function salvarPDF(){
   const btn=document.getElementById('btnPDF');
-  const alvo=document.querySelector('#rltOut .R');
-  if(!alvo){ alert('Clique em "Atualizar Relatório" antes de salvar o PDF.'); return; }
+  const orig=document.querySelector('#rltOut .R');
+  if(!orig){ alert('Clique em "Atualizar Relatório" antes de salvar o PDF.'); return; }
   bldR();
-  const rel=document.querySelector('#rltOut .R');
-  if(!rel) return;
+  const source=document.querySelector('#rltOut .R');
+  if(!source) return;
   const nome=(document.getElementById('fn')?.value||'aluno').replace(/\s+/g,'_');
   if(btn){ btn.disabled=true; btn.textContent='Gerando PDF...'; }
-  prepararPDF(rel);
-  await new Promise(r=>setTimeout(r,120));
+
+  const wrapper=document.createElement('div');
+  wrapper.style.cssText='position:fixed;left:0;top:0;width:'+PDF_W+'px;background:#fff;z-index:-1;opacity:0;pointer-events:none;overflow:hidden';
+  const clone=source.cloneNode(true);
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  prepararPDF(clone);
+  await new Promise(r=>setTimeout(r,250));
+
   try{
     await html2pdf().set({
       margin:0,
       filename:`Relatorio_Consulta_${nome}.pdf`,
-      image:{type:'jpeg',quality:0.98},
-      html2canvas:{scale:3,useCORS:true,letterRendering:true,backgroundColor:'#ffffff',width:PDF_W,windowWidth:PDF_W},
-      jsPDF:{unit:'mm',format:PDF_FMT,orientation:'portrait'},
-      pagebreak:{mode:['avoid-all','css','legacy']}
-    }).from(rel).save();
+      image:{type:'jpeg',quality:0.95},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',width:PDF_W,scrollX:0,scrollY:0},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['css','legacy']}
+    }).from(clone).save();
   }catch(e){
     console.error(e);
     alert('Não foi possível gerar o PDF. Tente novamente.');
   }finally{
-    limparPDF(rel);
+    limparPDF(clone,wrapper);
   }
   if(btn){ btn.disabled=false; btn.innerHTML='&#128424; Salvar PDF'; }
 }
