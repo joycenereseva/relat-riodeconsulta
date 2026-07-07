@@ -197,22 +197,11 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 .R-smart-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
 .R-smart-val{font-size:12.5px;color:#111}
 .R-disc-frase{background:#f0f7f3;border-left:3px solid #4d9e72;padding:14px 16px;border-radius:0 8px 8px 0;font-style:italic;font-size:13px;color:#333;line-height:1.7;margin-top:12px}
-.R.pdf-export{border-radius:0!important;overflow:hidden!important;width:794px!important;max-width:794px!important;box-sizing:border-box!important;margin:0!important;padding:0!important;background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-.R.pdf-export .R-capa{width:794px!important;max-width:794px!important;margin:0!important;padding:36px 28px 32px!important;background:#0e0e0e!important;box-sizing:border-box!important;border-radius:0!important;overflow:hidden!important;position:relative!important}
+.R.pdf-export{border-radius:0!important;overflow:hidden!important;width:794px!important;max-width:794px!important;margin:0!important;padding:0!important;background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+.R.pdf-export .R-capa{width:100%!important;max-width:100%!important;margin:0!important;padding:44px 40px 36px!important;background:#0e0e0e!important;border-radius:0!important;box-sizing:border-box!important;position:relative!important;overflow:hidden!important}
 .R.pdf-export .R-capa::after{display:none!important}
-.R.pdf-export .R-ttl{font-size:32px!important;line-height:1.15!important}
-.R.pdf-export .R-sub{font-size:13px!important}
-.R.pdf-export .R-lbl{font-size:11px!important}
-.R.pdf-export .R-chip{font-size:12px!important;padding:5px 12px!important}
-.R.pdf-export .R-sec{padding:22px 28px!important;box-sizing:border-box!important}
-.R.pdf-export .R-li{font-size:13px!important;line-height:1.5!important}
-.R.pdf-export .R-fittvp-val,.R.pdf-export .R-smart-val{font-size:13px!important;line-height:1.45!important}
-.R.pdf-export .R-q-txt{font-size:16px!important;line-height:1.55!important}
-.R.pdf-export .R-quote{border-radius:0!important;margin:0!important;padding:22px 28px!important;background:#111!important}
-.R.pdf-export .R-foot{width:794px!important;max-width:794px!important;margin:0!important;padding:20px 28px!important;background:#0e0e0e!important;box-sizing:border-box!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:8px!important}
-.R.pdf-export .R-foot-n{font-size:16px!important;color:#f0ebe0!important}
-.R.pdf-export .R-foot-i{font-size:11px!important;color:#888!important;text-align:right!important}
-.R.pdf-export img{max-width:100%!important;height:auto!important}
+.R.pdf-export .R-foot{width:100%!important;max-width:100%!important;margin:0!important;padding:18px 40px!important;background:#0e0e0e!important;border-radius:0!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
+.R.pdf-export .R-quote{border-radius:0!important}
 #pdf-staging{position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-9999;opacity:0;pointer-events:none;overflow:hidden}
 .no-print{display:block}
 @media print{
@@ -1219,7 +1208,7 @@ function carregarDadosPadrao(){
   gT(7);
 }
 
-// ===== SALVAR PDF — documento único (~4 páginas A4) =====
+// ===== SALVAR PDF — formato compacto 4 páginas (documento único) =====
 const PDF_W=794;
 
 function sliceCanvasToPDF(pdf,canvas,pageW,pageH){
