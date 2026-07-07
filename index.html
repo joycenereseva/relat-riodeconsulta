@@ -1224,7 +1224,7 @@ function carregarDadosPadrao(){
   gT(7);
 }
 
-// ===== SALVAR PDF — 4 páginas: seções 1–5 nas pág. 1–3, plano+ação na pág. 4 =====
+// ===== SALVAR PDF — 4 páginas: seções 1–5 (pág. 1–2), plano na pág. 3, fechamento na pág. 4 =====
 const PDF_W=794;
 const PDF_H=1123;
 
@@ -1238,21 +1238,19 @@ function buildPDFBlock1(source){
   return box;
 }
 
-function buildPDFBlock2(source){
+function buildPDFFixedPage(source,sectionIds,withFooter){
   const page=document.createElement('div');
   page.className='pdf-page-final';
   const body=document.createElement('div');
   body.className='pdf-page-body R pdf-export';
-  ['rsec-06','rsec-07','rsec-quote'].forEach(id=>{
+  sectionIds.forEach(id=>{
     const el=source.querySelector('#'+id);
     if(el) body.appendChild(el.cloneNode(true));
   });
   page.appendChild(body);
-  const foot=source.querySelector('.R-foot');
-  if(foot){
-    const f=foot.cloneNode(true);
-    f.classList.add('R-foot');
-    page.appendChild(f);
+  if(withFooter){
+    const foot=source.querySelector('.R-foot');
+    if(foot) page.appendChild(foot.cloneNode(true));
   }
   return page;
 }
@@ -1268,39 +1266,27 @@ async function mountForCapture(el){
 async function preparePDFBlock1(box){
   await mountForCapture(box);
   let h=box.offsetHeight;
-  const target=PDF_H*3;
+  const target=PDF_H*2;
   if(h>target){
     box.classList.add('pdf-block1-compact');
     await new Promise(r=>setTimeout(r,80));
     h=box.offsetHeight;
   }
   if(h>target){
-    const scale=target/h;
-    box.style.zoom=scale;
+    box.style.zoom=(target/h).toString();
     box.style.width=PDF_W+'px';
-    h=target;
-  }
-  if(h<target){
-    const pad=document.createElement('div');
-    pad.setAttribute('aria-hidden','true');
-    pad.style.height=(target-h)+'px';
-    pad.style.background='#fff';
-    box.appendChild(pad);
   }
   return box;
 }
 
-async function preparePDFBlock2(pageEl){
+async function preparePDFFixedPage(pageEl,withFooter){
   await mountForCapture(pageEl);
   const body=pageEl.querySelector('.pdf-page-body');
-  const foot=pageEl.querySelector('.R-foot');
-  const footH=foot?foot.offsetHeight:68;
+  const footH=withFooter?(pageEl.querySelector('.R-foot')?.offsetHeight||68):0;
   body.style.bottom=footH+'px';
   const avail=PDF_H-footH;
   const contentH=body.scrollHeight;
-  if(contentH>avail){
-    body.style.zoom=(avail/contentH).toString();
-  }
+  if(contentH>avail) body.style.zoom=(avail/contentH).toString();
   return pageEl;
 }
 
@@ -1353,12 +1339,16 @@ async function salvarPDF(){
     const block1=await preparePDFBlock1(buildPDFBlock1(source));
     const c1=await captureEl(block1);
     sliceCanvasToPDF(pdf,c1,pageW,pageH,state);
-    while(pdf.internal.getNumberOfPages()<3) pdf.addPage();
 
     pdf.addPage();
-    const block2=await preparePDFBlock2(buildPDFBlock2(source));
-    const c2=await captureEl(block2);
-    pdf.addImage(c2.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
+    const page3=await preparePDFFixedPage(buildPDFFixedPage(source,['rsec-06'],false),false);
+    const c3=await captureEl(page3);
+    pdf.addImage(c3.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
+
+    pdf.addPage();
+    const page4=await preparePDFFixedPage(buildPDFFixedPage(source,['rsec-07','rsec-quote'],true),true);
+    const c4=await captureEl(page4);
+    pdf.addImage(c4.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
 
     pdf.save(`Relatorio_Consulta_${nome}.pdf`);
   }catch(e){
