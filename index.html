@@ -1275,6 +1275,14 @@ async function preparePDFBlock1(box){
   if(h>target){
     box.style.zoom=(target/h).toString();
     box.style.width=PDF_W+'px';
+    h=target;
+  }
+  if(h<target){
+    const pad=document.createElement('div');
+    pad.setAttribute('aria-hidden','true');
+    pad.style.height=(target-h)+'px';
+    pad.style.background='#fff';
+    box.appendChild(pad);
   }
   return box;
 }
@@ -1339,6 +1347,7 @@ async function salvarPDF(){
     const block1=await preparePDFBlock1(buildPDFBlock1(source));
     const c1=await captureEl(block1);
     sliceCanvasToPDF(pdf,c1,pageW,pageH,state);
+    while(pdf.internal.getNumberOfPages()<2) pdf.addPage();
 
     pdf.addPage();
     const page3=await preparePDFFixedPage(buildPDFFixedPage(source,['rsec-06'],false),false);
