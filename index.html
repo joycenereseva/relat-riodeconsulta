@@ -204,17 +204,20 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 .R.pdf-export .R-quote{border-radius:0!important}
 .pdf-page-final{position:relative!important;width:794px!important;height:1123px!important;min-height:1123px!important;max-height:1123px!important;background:#fff!important;box-sizing:border-box!important;overflow:hidden!important}
 .pdf-page-final .pdf-page-body{position:absolute!important;top:0!important;left:0!important;width:794px!important;overflow:hidden!important;box-sizing:border-box!important}
-.pdf-page-final .R-sec{padding:14px 28px!important;border-bottom:none!important;break-inside:avoid!important;page-break-inside:avoid!important}
-.pdf-page-final .R-sec:last-of-type{padding-bottom:10px!important}
-.pdf-page-final .R-tit{font-size:19px!important;margin-bottom:10px!important}
-.pdf-page-final .R-fittvp{gap:6px!important;margin-bottom:0!important}
-.pdf-page-final .R-fittvp-val,.pdf-page-final .R-smart-val{font-size:11.5px!important;line-height:1.35!important}
-.pdf-page-final .R-fittvp-lbl,.pdf-page-final .R-smart-label{font-size:9px!important}
-.pdf-page-final .R-smart{gap:5px!important;margin-bottom:0!important}
-.pdf-page-final .R-smart-item,.pdf-page-final .R-fittvp-item{padding:7px 11px!important}
-.pdf-page-final .R-quote{padding:14px 20px!important;margin-top:0!important}
-.pdf-page-final .R-q-txt{font-size:13px!important;line-height:1.45!important}
+.pdf-page-final .R-sec{border-bottom:none!important;break-inside:avoid!important;page-break-inside:avoid!important}
 .pdf-page-final .R-foot{position:absolute!important;bottom:0!important;left:0!important;right:0!important;margin-top:0!important;flex-shrink:0!important;width:100%!important}
+.pdf-mobile-readable .R-sec{padding:22px 34px!important}
+.pdf-mobile-readable .R-num{font-size:12px!important}
+.pdf-mobile-readable .R-tit{font-size:24px!important;margin-bottom:14px!important}
+.pdf-mobile-readable .R-fittvp{gap:10px!important;margin-bottom:0!important}
+.pdf-mobile-readable .R-fittvp-val,.pdf-mobile-readable .R-smart-val{font-size:16px!important;line-height:1.6!important}
+.pdf-mobile-readable .R-fittvp-lbl,.pdf-mobile-readable .R-smart-label{font-size:12px!important}
+.pdf-mobile-readable .R-smart{gap:10px!important;margin-bottom:0!important}
+.pdf-mobile-readable .R-smart-item,.pdf-mobile-readable .R-fittvp-item{padding:13px 17px!important}
+.pdf-mobile-readable .R-smart-l{font-size:24px!important}
+.pdf-mobile-readable .R-quote{padding:22px 28px!important;margin-top:0!important}
+.pdf-mobile-readable .R-q-txt{font-size:18px!important;line-height:1.65!important}
+.pdf-mobile-readable .R-q-sig{font-size:12px!important}
 .R.pdf-export.pdf-block1-compact .R-sec{padding:18px 32px!important}
 .R.pdf-export.pdf-block1-compact .R-tit{font-size:19px!important;margin-bottom:12px!important}
 .R.pdf-export.pdf-block1-compact .R-met4,.R.pdf-export.pdf-block1-compact .R-dc-grid,.R.pdf-export.pdf-block1-compact .R-hex{gap:7px!important;margin-bottom:10px!important}
@@ -1224,7 +1227,7 @@ function carregarDadosPadrao(){
   gT(7);
 }
 
-// ===== SALVAR PDF — 4 páginas: seções 1–5 (pág. 1–2), plano na pág. 3, fechamento na pág. 4 =====
+// ===== SALVAR PDF — pág. 1–2: seções 1–5 | pág. 3: plano | pág. 4+: fechamento legível no celular =====
 const PDF_W=794;
 const PDF_H=1123;
 
@@ -1238,11 +1241,11 @@ function buildPDFBlock1(source){
   return box;
 }
 
-function buildPDFFixedPage(source,sectionIds,withFooter){
+function buildPDFPageEl(source,sectionIds,withFooter){
   const page=document.createElement('div');
-  page.className='pdf-page-final';
+  page.className='pdf-page-final pdf-mobile-readable';
   const body=document.createElement('div');
-  body.className='pdf-page-body R pdf-export';
+  body.className='pdf-page-body R pdf-export pdf-mobile-readable';
   sectionIds.forEach(id=>{
     const el=source.querySelector('#'+id);
     if(el) body.appendChild(el.cloneNode(true));
@@ -1261,6 +1264,55 @@ async function mountForCapture(el){
   staging.appendChild(el);
   await document.fonts.ready;
   await new Promise(r=>setTimeout(r,250));
+}
+
+async function measureSectionsHeight(source,sectionIds){
+  const box=document.createElement('div');
+  box.className='R pdf-export pdf-mobile-readable';
+  box.style.width=PDF_W+'px';
+  sectionIds.forEach(id=>{
+    const el=source.querySelector('#'+id);
+    if(el) box.appendChild(el.cloneNode(true));
+  });
+  await mountForCapture(box);
+  return box.offsetHeight;
+}
+
+async function measureFooterHeight(source){
+  const foot=source.querySelector('.R-foot');
+  if(!foot) return 0;
+  const wrap=document.createElement('div');
+  wrap.className='pdf-page-final';
+  wrap.style.width=PDF_W+'px';
+  wrap.appendChild(foot.cloneNode(true));
+  await mountForCapture(wrap);
+  return wrap.querySelector('.R-foot')?.offsetHeight||68;
+}
+
+async function paginateSections(source,sectionIds,footerOnLast){
+  const footH=footerOnLast?await measureFooterHeight(source):0;
+  const pages=[];
+  let cur=[], curH=0;
+  for(let i=0;i<sectionIds.length;i++){
+    const id=sectionIds[i];
+    const h=await measureSectionsHeight(source,[id]);
+    if(!h) continue;
+    const isLast=i===sectionIds.length-1;
+    const pageBudget=PDF_H-(isLast&&footerOnLast?footH:0);
+    if(h>pageBudget){
+      if(cur.length){ pages.push({ids:[...cur],footer:false}); cur=[]; curH=0; }
+      pages.push({ids:[id],footer:isLast&&footerOnLast});
+      continue;
+    }
+    if(curH+h>pageBudget&&cur.length){
+      pages.push({ids:[...cur],footer:false});
+      cur=[id]; curH=h;
+    }else{
+      cur.push(id); curH+=h;
+    }
+  }
+  if(cur.length) pages.push({ids:[...cur],footer:footerOnLast});
+  return pages;
 }
 
 async function preparePDFBlock1(box){
@@ -1287,14 +1339,11 @@ async function preparePDFBlock1(box){
   return box;
 }
 
-async function preparePDFFixedPage(pageEl,withFooter){
+async function preparePDFPage(pageEl,withFooter){
   await mountForCapture(pageEl);
   const body=pageEl.querySelector('.pdf-page-body');
   const footH=withFooter?(pageEl.querySelector('.R-foot')?.offsetHeight||68):0;
   body.style.bottom=footH+'px';
-  const avail=PDF_H-footH;
-  const contentH=body.scrollHeight;
-  if(contentH>avail) body.style.zoom=(avail/contentH).toString();
   return pageEl;
 }
 
@@ -1303,6 +1352,17 @@ async function captureEl(el){
     scale:2,useCORS:true,backgroundColor:'#ffffff',
     width:PDF_W,windowWidth:PDF_W,scrollX:0,scrollY:0,logging:false
   });
+}
+
+async function appendSectionPages(pdf,source,sectionIds,footerOnLast,pageW,pageH,state){
+  const layout=await paginateSections(source,sectionIds,footerOnLast);
+  for(const pg of layout){
+    if(!state.first) pdf.addPage();
+    else state.first=false;
+    const pageEl=await preparePDFPage(buildPDFPageEl(source,pg.ids,pg.footer),pg.footer);
+    const canvas=await captureEl(pageEl);
+    pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
+  }
 }
 
 function sliceCanvasToPDF(pdf,canvas,pageW,pageH,state){
@@ -1349,15 +1409,9 @@ async function salvarPDF(){
     sliceCanvasToPDF(pdf,c1,pageW,pageH,state);
     while(pdf.internal.getNumberOfPages()<2) pdf.addPage();
 
-    pdf.addPage();
-    const page3=await preparePDFFixedPage(buildPDFFixedPage(source,['rsec-06'],false),false);
-    const c3=await captureEl(page3);
-    pdf.addImage(c3.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
-
-    pdf.addPage();
-    const page4=await preparePDFFixedPage(buildPDFFixedPage(source,['rsec-07','rsec-quote'],true),true);
-    const c4=await captureEl(page4);
-    pdf.addImage(c4.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
+    await appendSectionPages(pdf,source,['rsec-06'],false,pageW,pageH,state);
+    await appendSectionPages(pdf,source,['rsec-07'],false,pageW,pageH,state);
+    await appendSectionPages(pdf,source,['rsec-quote'],true,pageW,pageH,state);
 
     pdf.save(`Relatorio_Consulta_${nome}.pdf`);
   }catch(e){
