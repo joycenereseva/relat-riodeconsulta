@@ -202,7 +202,23 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 .R.pdf-export .R-capa::after{display:none!important}
 .R.pdf-export .R-foot{width:100%!important;max-width:100%!important;margin:0!important;padding:18px 40px!important;background:#0e0e0e!important;border-radius:0!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
 .R.pdf-export .R-quote{border-radius:0!important}
-#pdf-staging{position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-9999;opacity:0;pointer-events:none;overflow:hidden}
+.pdf-page-final{position:relative!important;width:794px!important;height:1123px!important;min-height:1123px!important;max-height:1123px!important;background:#fff!important;box-sizing:border-box!important;overflow:hidden!important}
+.pdf-page-final .pdf-page-body{position:absolute!important;top:0!important;left:0!important;width:794px!important;overflow:hidden!important;box-sizing:border-box!important}
+.pdf-page-final .R-sec{padding:14px 28px!important;border-bottom:none!important;break-inside:avoid!important;page-break-inside:avoid!important}
+.pdf-page-final .R-sec:last-of-type{padding-bottom:10px!important}
+.pdf-page-final .R-tit{font-size:19px!important;margin-bottom:10px!important}
+.pdf-page-final .R-fittvp{gap:6px!important;margin-bottom:0!important}
+.pdf-page-final .R-fittvp-val,.pdf-page-final .R-smart-val{font-size:11.5px!important;line-height:1.35!important}
+.pdf-page-final .R-fittvp-lbl,.pdf-page-final .R-smart-label{font-size:9px!important}
+.pdf-page-final .R-smart{gap:5px!important;margin-bottom:0!important}
+.pdf-page-final .R-smart-item,.pdf-page-final .R-fittvp-item{padding:7px 11px!important}
+.pdf-page-final .R-quote{padding:14px 20px!important;margin-top:0!important}
+.pdf-page-final .R-q-txt{font-size:13px!important;line-height:1.45!important}
+.pdf-page-final .R-foot{position:absolute!important;bottom:0!important;left:0!important;right:0!important;margin-top:0!important;flex-shrink:0!important;width:100%!important}
+.R.pdf-export.pdf-block1-compact .R-sec{padding:18px 32px!important}
+.R.pdf-export.pdf-block1-compact .R-tit{font-size:19px!important;margin-bottom:12px!important}
+.R.pdf-export.pdf-block1-compact .R-met4,.R.pdf-export.pdf-block1-compact .R-dc-grid,.R.pdf-export.pdf-block1-compact .R-hex{gap:7px!important;margin-bottom:10px!important}
+#pdf-staging{position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-9999;pointer-events:none;overflow:hidden}
 .no-print{display:block}
 @media print{
   @page{size:A4;margin:0}
@@ -1092,8 +1108,8 @@ function bldR(){
 </div>
 
 <!-- 06: PLANO DE AÇÃO FITTVP -->
-<div class="R-sec">
-  <div class="R-num">06 &#183; Prescrição de Exercício</div>
+<div class="R-sec" id="rsec-06">
+  <div class="R-num">06 &#183; Plano de Ação</div>
   <div class="R-tit">Plano <span>FITTVP-AFFECT</span></div>
   <div class="R-fittvp">
     ${ff.freq?`<div class="R-fittvp-item"><div class="R-fittvp-lbl">F &#8212; Frequência</div><div class="R-fittvp-val">${ff.freq}</div></div>`:''}
@@ -1108,7 +1124,7 @@ function bldR(){
 </div>
 
 <!-- 07: METAS SMART -->
-<div class="R-sec">
+<div class="R-sec" id="rsec-07">
   <div class="R-num">07 &#183; Objetivos e Resultados</div>
   <div class="R-tit">Metas <span>SMART</span></div>
   <div class="R-smart">
@@ -1120,7 +1136,7 @@ function bldR(){
   </div>
 </div>
 
-${parecer?`<div class="R-sec">
+${parecer?`<div class="R-sec" id="rsec-quote">
   <div class="R-quote">
     <div style="font-size:26px;color:#4d9e72;line-height:1;margin-bottom:9px">&#8220;</div>
     <div class="R-q-txt">${parecer}</div>
@@ -1208,15 +1224,101 @@ function carregarDadosPadrao(){
   gT(7);
 }
 
-// ===== SALVAR PDF — formato compacto 4 páginas (documento único) =====
+// ===== SALVAR PDF — 4 páginas: seções 1–5 nas pág. 1–3, plano+ação na pág. 4 =====
 const PDF_W=794;
+const PDF_H=1123;
 
-function sliceCanvasToPDF(pdf,canvas,pageW,pageH){
+function buildPDFBlock1(source){
+  const box=document.createElement('div');
+  box.className='R pdf-export';
+  for(const el of source.children){
+    if(el.id==='rsec-06') break;
+    box.appendChild(el.cloneNode(true));
+  }
+  return box;
+}
+
+function buildPDFBlock2(source){
+  const page=document.createElement('div');
+  page.className='pdf-page-final';
+  const body=document.createElement('div');
+  body.className='pdf-page-body R pdf-export';
+  ['rsec-06','rsec-07','rsec-quote'].forEach(id=>{
+    const el=source.querySelector('#'+id);
+    if(el) body.appendChild(el.cloneNode(true));
+  });
+  page.appendChild(body);
+  const foot=source.querySelector('.R-foot');
+  if(foot){
+    const f=foot.cloneNode(true);
+    f.classList.add('R-foot');
+    page.appendChild(f);
+  }
+  return page;
+}
+
+async function mountForCapture(el){
+  const staging=document.getElementById('pdf-staging');
+  staging.innerHTML='';
+  staging.appendChild(el);
+  await document.fonts.ready;
+  await new Promise(r=>setTimeout(r,250));
+}
+
+async function preparePDFBlock1(box){
+  await mountForCapture(box);
+  let h=box.offsetHeight;
+  const target=PDF_H*3;
+  if(h>target){
+    box.classList.add('pdf-block1-compact');
+    await new Promise(r=>setTimeout(r,80));
+    h=box.offsetHeight;
+  }
+  if(h>target){
+    const scale=target/h;
+    box.style.zoom=scale;
+    box.style.width=PDF_W+'px';
+    h=target;
+  }
+  if(h<target){
+    const pad=document.createElement('div');
+    pad.setAttribute('aria-hidden','true');
+    pad.style.height=(target-h)+'px';
+    pad.style.background='#fff';
+    box.appendChild(pad);
+  }
+  return box;
+}
+
+async function preparePDFBlock2(pageEl){
+  await mountForCapture(pageEl);
+  const body=pageEl.querySelector('.pdf-page-body');
+  const foot=pageEl.querySelector('.R-foot');
+  const footH=foot?foot.offsetHeight:68;
+  body.style.bottom=footH+'px';
+  const avail=PDF_H-footH;
+  const contentH=body.scrollHeight;
+  if(contentH>avail){
+    body.style.zoom=(avail/contentH).toString();
+  }
+  return pageEl;
+}
+
+async function captureEl(el){
+  return html2canvas(el,{
+    scale:2,useCORS:true,backgroundColor:'#ffffff',
+    width:PDF_W,windowWidth:PDF_W,scrollX:0,scrollY:0,logging:false
+  });
+}
+
+function sliceCanvasToPDF(pdf,canvas,pageW,pageH,state){
   const imgW=pageW;
   const sliceHpx=(pageH/imgW)*canvas.width;
-  let y=0, first=true;
-  while(y<canvas.height){
-    const h=Math.min(sliceHpx,canvas.height-y);
+  let y=0, n=0;
+  while(y<canvas.height-1){
+    const remaining=canvas.height-y;
+    if(remaining<=sliceHpx*0.04) break;
+    const h=Math.min(sliceHpx,remaining);
     const slice=document.createElement('canvas');
     slice.width=canvas.width; slice.height=Math.ceil(h);
     const ctx=slice.getContext('2d');
@@ -1224,11 +1326,12 @@ function sliceCanvasToPDF(pdf,canvas,pageW,pageH){
     ctx.fillRect(0,0,slice.width,slice.height);
     ctx.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
     const renderH=(h/canvas.width)*imgW;
-    if(!first) pdf.addPage();
-    else first=false;
+    if(!state.first) pdf.addPage();
+    else state.first=false;
     pdf.addImage(slice.toDataURL('image/jpeg',0.95),'JPEG',0,0,imgW,renderH);
-    y+=h;
+    y+=h; n++;
   }
+  return n;
 }
 
 async function salvarPDF(){
@@ -1238,30 +1341,31 @@ async function salvarPDF(){
   const source=document.querySelector('#rltOut .R');
   if(!source) return;
   const nome=(document.getElementById('fn')?.value||'aluno').replace(/\s+/g,'_');
-  const staging=document.getElementById('pdf-staging');
   if(btn){ btn.disabled=true; btn.textContent='Gerando PDF...'; }
 
-  staging.innerHTML='';
-  const clone=source.cloneNode(true);
-  clone.classList.add('pdf-export');
-  staging.appendChild(clone);
-
   try{
-    await document.fonts.ready;
-    await new Promise(r=>setTimeout(r,300));
-    const canvas=await html2canvas(clone,{
-      scale:2,useCORS:true,backgroundColor:'#ffffff',
-      width:PDF_W,windowWidth:PDF_W,scrollX:0,scrollY:0,logging:false
-    });
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
-    sliceCanvasToPDF(pdf,canvas,pdf.internal.pageSize.getWidth(),pdf.internal.pageSize.getHeight());
+    const pageW=pdf.internal.pageSize.getWidth();
+    const pageH=pdf.internal.pageSize.getHeight();
+    const state={first:true};
+
+    const block1=await preparePDFBlock1(buildPDFBlock1(source));
+    const c1=await captureEl(block1);
+    sliceCanvasToPDF(pdf,c1,pageW,pageH,state);
+    while(pdf.internal.getNumberOfPages()<3) pdf.addPage();
+
+    pdf.addPage();
+    const block2=await preparePDFBlock2(buildPDFBlock2(source));
+    const c2=await captureEl(block2);
+    pdf.addImage(c2.toDataURL('image/jpeg',0.95),'JPEG',0,0,pageW,pageH);
+
     pdf.save(`Relatorio_Consulta_${nome}.pdf`);
   }catch(e){
     console.error(e);
     alert('Não foi possível gerar o PDF. Tente novamente.');
   }finally{
-    staging.innerHTML='';
+    document.getElementById('pdf-staging').innerHTML='';
     if(btn){ btn.disabled=false; btn.innerHTML='&#128424; Salvar PDF'; }
   }
 }
