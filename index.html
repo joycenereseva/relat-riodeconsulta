@@ -6,6 +6,7 @@
 <title>Profª Joyce Neres — Sistema de Consulta</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -195,15 +196,24 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 .R-smart-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
 .R-smart-val{font-size:12.5px;color:#111}
 .R-disc-frase{background:#f0f7f3;border-left:3px solid #4d9e72;padding:14px 16px;border-radius:0 8px 8px 0;font-style:italic;font-size:13px;color:#333;line-height:1.7;margin-top:12px}
+.no-print{display:block}
 @media print{
-  .hdr,.tabs,.brow,.uz,.btn{display:none!important}
+  @page{size:A4;margin:0}
+  html,body{width:100%;height:auto;margin:0;padding:0;background:#fff!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .hdr,.tabs,.brow,.uz,.btn,.hero,.no-print{display:none!important}
   body{background:#fff!important;color:#1a1a1a!important}
-  .app{max-width:100%!important;padding:0!important}
+  .app{max-width:100%!important;padding:0!important;margin:0!important}
   .sec{display:none!important}
   #t7{display:block!important;padding:0!important}
   .card{background:transparent!important;box-shadow:none!important;border:none!important;padding:0!important;margin:0!important}
-  .R-sec{page-break-inside:avoid}
-  .R{border-radius:0!important}
+  .R{background:#fff!important;color:#1a1a1a!important;border-radius:0!important;overflow:visible!important}
+  .R-capa{background:#0e0e0e!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .R-foot{background:#0e0e0e!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .R-quote{background:#111!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .R-chip,.R-dc,.R-met,.R-fittvp-item,.R-smart-item,.R-hex-i,.R-risco,.R-disc-frase{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .R-sec{page-break-inside:avoid;padding:24px 32px!important}
+  .R-sec:last-child{border-bottom:none!important}
 }
 @media(max-width:600px){
   .fg,.disc-grid,.hexg,.mg,.pcs,.R-2col,.R-met4,.R-dc-grid,.R-hex,.R-fittvp,.fittvp-grid{grid-template-columns:1fr!important}
@@ -439,15 +449,14 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
 
 <!-- T7: RELATÓRIO FINAL -->
 <div class="sec" id="t7">
-<div class="hero"><div class="hero-lbl">Relatório de Entrega</div><div class="hero-ttl">Documento <b>Final</b></div></div>
+<div class="hero no-print"><div class="hero-lbl">Relatório de Entrega</div><div class="hero-ttl">Documento <b>Final</b></div></div>
 <div class="card">
-  <div class="brow" style="margin-top:0;margin-bottom:14px">
+  <div class="brow no-print" style="margin-top:0;margin-bottom:14px">
     <button class="btn bp" onclick="bldR()">Atualizar Relatório</button>
-    <button class="btn bo" onclick="window.print()">&#128424; Imprimir / Salvar PDF</button>
+    <button class="btn bo" onclick="salvarPDF()" id="btnPDF">&#128424; Salvar PDF</button>
   </div>
   <div id="rltOut"></div>
 </div>
-<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">Ctrl+P &#8594; desmarque <strong>&#8220;Cabeçalhos e rodapés&#8221;</strong> &#8594; Salvar como PDF</div>
 </div>
 
 </div><!-- end .app -->
@@ -745,6 +754,7 @@ function upD(){
 document.addEventListener('DOMContentLoaded',()=>{
   const frEl=document.getElementById('discFrase');
   if(frEl) frEl.addEventListener('input',()=>{ frEl.dataset.editado='1'; });
+  carregarDadosPadrao();
 });
 
 function iDC(){
@@ -1118,7 +1128,103 @@ ${parecer?`<div class="R-sec">
 </div>`;
 }
 
-// ===== PREENCHER AUTOMATICAMENTE — Aba 1 (Anamnese + DISC + Motivacional + Bem-Estar) =====
+// ===== DADOS PADRÃO — Vitória Cardoso =====
+const DADOS_VITORIA={
+  fn:'Vitória Cardoso',fs:'F',fi2:'27',fp:'73',fh:'167',
+  fci:'',fpas:'',fcol:'',fhdl:'45',
+  fniv:'iniciante',fdb:'nao',ftab:'nao',fah:'nao',fhd:'nao',fhdm:'3',faf:'moderado',
+  fobj:'Emagrecimento sem perda de massa muscular',
+  fcon:'Nenhuma condição médica pré-existente',
+  fmed:'0',
+  fobs:'Pratica musculação, dorme mal. Mais energia pela manhã, trabalho flexível.',
+  disc:{D:2,I:5,S:1,C:2},
+  discFrase:'Vitória Cardoso, o perfil dominante deu : Analisador. Significa que você precisa entender o porquê antes de confiar no processo. Isso é uma força: você não desiste por impulso, você questiona e aprofunda. Vou te dar a fundamentação técnica de cada escolha, um plano detalhado e critérios claros de progressão. Você vai saber exatamente o que está fazendo e por quê.',
+  estagios:['preparacao','acao'],
+  fmot:'Necessita de coerência e direcionamento embasado. Autonomia: Opções reais e escolha e possibilidade de manejo na semana. Competência: Evidência de evolução (guia de medidas e mini app de cárdio atenderá essa necessidade.) Vínculo: Ter acesso aos porquês da prescrição. "RECOMPENSA DE PROCESSO - Baseado em neurociências" conforme COMBINADO (JUNTAS)',
+  hexA:[2,3,3,2,2,4],hexI:[4,5,4,4,4,5],
+  fPF:'Já pratica musculação, tem base motora e não começa do zero, além de ambiente enriquecido para a prática.\nSegue dieta supervisionada por nutricionista (1300kcal), aderência alimentar presente.\nAlta disponibilidade de treino (Seg-Dom, manhã ou tarde, 1h)\nMotivação clara e específica, não quer só emagrecer, quer preservar massa.\nPerfil Analisador: Tendência à aderir ao processo se entender o porquê.\nSem condições médicas, sem medicamentos, sem cirurgias\nNão fuma, álcool raramente\nMais energia pela manhã, com trabalho flexível. Janela de treino identificada.',
+  fPM:'Sono comprometido: 5/6h com qualidade ruim, acorda cansada, impacta recuperação, cortisol e retenção de gordura.\nCansaço mental alto no trabalho: Aumenta risco de abandono por sobrecarga.\nTrabalha sentada: Baixo gasto calórico diário fora do treino.\nCardio atual leve/moderado: Intensidade insuficiente para o objetivo de emagrecimento com preservação muscular.\nHistórico de tentativa anterior malsucedida: "deu certo mas não me sinto bem", sinal de alerta importante.\nPeríodo mais cansado à tarde: Treinos vespertinos podem ter qualidade comprometida (MAASS, também podem exercer função relaxadora e desligamento das atividades diárias)',
+  ffFreq:'Cárdio 3x por semana',
+  ffInt:'HIIT: 85-90% Vvo2 max (Zona 4-5) | Longo: 60-70% Vvo2max (Zona 2) | Livre: 65-75% Vvo0max (Zona 2-3) - Especificidade somente com teste de Conconi',
+  ffTipo:'Sessão 1 - HIIT na esteira | Sessão 2 - Corrida longa contínua (esteira ou rua) | Sessão 3 - Corrida livre na zona indicada (esteira ou rua, preferência da aluna)',
+  ffTempo:'HIIT: 20-25 min | Longo: 35-40 min | Livre: 30-35 min',
+  ffVol:'85-100 min semanais de corrida total',
+  ffProg:'Semanas 1-2: adaptação nas zonas, pace leve. Semanas 3-4: aumentar 5 min no longo. Semana 5+: elevar intervalos do HIIT (30s:30s → 40s:20s) + aumento de intensidade conforme resposta para manter 75 min vigoroso na semana.',
+  ffAfeto:'Prefere correr na rua: respeitar essa preferência é chave para aderência. Sessões na rua têm valor motivacional extra. HIIT na esteira garante controle de intensidade e poderá ser realizado apenas 1x na semana.',
+  ffObs:'Cardio APÓS musculação ou em dias separados. Sugestão de realizar em dias separados. Vvo2max como medidor base, além da FC. Monitorar fadiga para manejo de estresse e redução de lesões. Sono ruim exige atenção à recuperação entre sessões.',
+  smS:'Reduzir gordura corporal mantendo ou aumentando da massa magra, com foco estético em braços e glúteo, através de 3 sessões semanais de corrida periodizada, combinadas com musculação.',
+  smM:'Peso corporal, perímetro de braço e glúteo (fita mensal) através do meu guia de medidas, exclusivo. Percepção de disposição e qualidade do sono (escala semanal 0-10), progressão de volume na corrida para 150 min. moderado ou 75 min vigoroso) conforme recomendação (OMS)',
+  smA:'Vitória você já pratica musculação, segue dieta com nutricionista e tem alta disponibilidade semanal. Tem excelentes vantagens para progressão gradual e segura para o seu perfil atual sem restrições clínicas e terá acesso à ferramentas exclusivas. É realista para o seu contexto.',
+  smR:'Isso importa para você, não somente para o emagrecimento com preservação muscular, mas por uma questão motivacional estética de querer definir mais o corpo e se sentir melhor consigo mesma. A corrida periodizada maximiza gasto calórico sem sacrificar massa, e se alinha com o que busca para o seu bem-estar geral.',
+  smT:'Seu programa será de 12 semanas, com reavaliação MENSAL, através de fotos e métricas. VOCÊ ME ENVIARÁ VIA WHATSAPP.',
+  fParecer:'Seu sucesso vai vir do acúmulo dos dias em que você escolher vencer a si mesma. O mais difícil você já faz, Vitória ! Que é treinar e querer melhora. Você só precisa de método e consistência. Para isso estou aqui, te ajudarei nessa fase !'
+};
+
+function aplicarDados(d){
+  const sv=(id,v)=>{ if(v!=null&&v!==''){ const el=document.getElementById(id); if(el) el.value=v; }};
+  ['fn','fs','fi2','fp','fh','fci','fpas','fcol','fhdl','fniv','fdb','ftab','fah','fhd','fhdm','faf','fobj','fcon','fmed','fobs','fmot','fPF','fPM','ffFreq','ffInt','ffTipo','ffTempo','ffVol','ffProg','ffAfeto','ffObs','smS','smM','smA','smR','smT','fParecer'].forEach(k=>sv(k,d[k]));
+  if(d.disc){
+    const map=[['slD','vD','D'],['slI','vI','I'],['slS','vS','S'],['slC','vC','C']];
+    map.forEach(([sid,vid,key])=>{
+      const el=document.getElementById(sid);
+      if(el){ el.value=d.disc[key]; document.getElementById(vid).textContent=d.disc[key]; }
+    });
+    if(S.dc) S.dc.data.datasets[0].data=[d.disc.D,d.disc.I,d.disc.S,d.disc.C];
+  }
+  if(d.discFrase){ const fr=document.getElementById('discFrase'); if(fr){ fr.value=d.discFrase; fr.dataset.editado='1'; } }
+  if(d.estagios){
+    S.es=[...d.estagios];
+    document.querySelectorAll('.ei').forEach(el=>{
+      const m=el.getAttribute('onclick')?.match(/'([^']+)'/);
+      el.classList.toggle('sel',!!(m&&S.es.includes(m[1])));
+    });
+  }
+  if(d.hexA&&d.hexI){
+    for(let i=0;i<6;i++){
+      const a=document.getElementById('hA'+i), iv=document.getElementById('hI'+i);
+      if(a){ a.value=d.hexA[i]; document.getElementById('hAv'+i).textContent=d.hexA[i]; }
+      if(iv){ iv.value=d.hexI[i]; document.getElementById('hIv'+i).textContent=d.hexI[i]; }
+    }
+    if(S.hc){ S.hc.data.datasets[0].data=d.hexA; S.hc.data.datasets[1].data=d.hexI; }
+  }
+  cIMC();
+  cFRS(); cFDR(); cACSM();
+  if(S.dc) S.dc.update();
+  if(S.hc) S.hc.update();
+  upD();
+}
+
+function carregarDadosPadrao(){
+  aplicarDados(DADOS_VITORIA);
+  bldR();
+}
+
+// ===== SALVAR PDF (sem cabeçalhos do navegador) =====
+async function salvarPDF(){
+  const btn=document.getElementById('btnPDF');
+  const alvo=document.querySelector('#rltOut .R');
+  if(!alvo){ alert('Clique em "Atualizar Relatório" antes de salvar o PDF.'); return; }
+  bldR();
+  const rel=document.querySelector('#rltOut .R');
+  if(!rel) return;
+  const nome=(document.getElementById('fn')?.value||'aluno').replace(/\s+/g,'_');
+  if(btn){ btn.disabled=true; btn.textContent='Gerando PDF...'; }
+  try{
+    await html2pdf().set({
+      margin:[8,8,8,8],
+      filename:`Relatorio_Consulta_${nome}.pdf`,
+      image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,useCORS:true,letterRendering:true,backgroundColor:'#ffffff'},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['avoid-all','css','legacy']}
+    }).from(rel).save();
+  }catch(e){
+    console.error(e);
+    alert('Não foi possível gerar o PDF. Tente novamente.');
+  }
+  if(btn){ btn.disabled=false; btn.innerHTML='&#128424; Salvar PDF'; }
+}
+
 function preencherAuto(){
   const txt = document.getElementById('txtColar').value.trim();
   const st = document.getElementById('autoSt');
