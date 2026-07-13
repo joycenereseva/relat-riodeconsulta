@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index,follow" id="metaRobots">
 <title>Profª Joyce Neres — Sistema de Consulta</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -250,9 +252,48 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
   .R-ttl{font-size:25px}
   .R-foot{padding:15px 18px;flex-direction:column;gap:7px;text-align:center}
 }
+/* ===== MODO COMPARTILHAR (link WhatsApp — leitura no celular) ===== */
+.share-bar{display:none;position:sticky;top:0;z-index:300;background:#0e0e0e;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.share-bar-nome{font-family:var(--fd);font-style:italic;color:var(--creme);font-size:18px;line-height:1.2}
+.share-bar-sub{font-size:11px;color:var(--em-c);margin-top:4px;letter-spacing:.3px}
+.share-link-box{display:none;margin-top:12px;padding:12px 14px;background:var(--sup2);border:1px solid var(--em-b);border-radius:var(--r);font-size:12px;color:var(--txt);word-break:break-all;line-height:1.5}
+.share-link-box.on{display:block}
+.bw{background:#25D366;color:#fff}
+.bw:hover{background:#20bd5a;color:#fff}
+body.modo-compartilhar{background:#fff!important;color:#1a1a1a!important}
+body.modo-compartilhar .hdr,body.modo-compartilhar .tabs,body.modo-compartilhar .no-print{display:none!important}
+body.modo-compartilhar .app{max-width:100%!important;padding:0!important;margin:0!important}
+body.modo-compartilhar .sec{display:none!important}
+body.modo-compartilhar #t7{display:block!important;padding:0!important}
+body.modo-compartilhar .card{background:transparent!important;border:none!important;padding:0!important;margin:0!important;box-shadow:none!important}
+body.modo-compartilhar .share-bar{display:block!important}
+body.modo-compartilhar .R{border-radius:0!important;overflow:visible!important}
+body.modo-compartilhar .R-sec{padding:24px 20px!important}
+body.modo-compartilhar .R-num{font-size:13px!important}
+body.modo-compartilhar .R-tit{font-size:26px!important;margin-bottom:16px!important}
+body.modo-compartilhar .R-li{font-size:16px!important;line-height:1.65!important}
+body.modo-compartilhar .R-met-v{font-size:20px!important}
+body.modo-compartilhar .R-met-l,body.modo-compartilhar .R-met-s{font-size:13px!important}
+body.modo-compartilhar .R-fittvp-val,body.modo-compartilhar .R-smart-val{font-size:16px!important;line-height:1.62!important}
+body.modo-compartilhar .R-fittvp-lbl,body.modo-compartilhar .R-smart-label{font-size:12px!important}
+body.modo-compartilhar .R-fittvp-item,body.modo-compartilhar .R-smart-item{padding:14px 16px!important}
+body.modo-compartilhar .R-q-txt{font-size:18px!important;line-height:1.65!important}
+body.modo-compartilhar .R-disc-frase{font-size:16px!important;line-height:1.7!important}
+body.modo-compartilhar .R-dc-grid,body.modo-compartilhar .R-met4,body.modo-compartilhar .R-hex,body.modo-compartilhar .R-fittvp,body.modo-compartilhar .R-2col{grid-template-columns:1fr!important}
+@media(max-width:600px){
+  body.modo-compartilhar .R-capa{padding:32px 20px 28px!important}
+  body.modo-compartilhar .R-ttl{font-size:28px!important}
+  body.modo-compartilhar .R-sec{padding:22px 16px!important}
+  body.modo-compartilhar .R-fittvp-val,body.modo-compartilhar .R-smart-val{font-size:17px!important}
+  body.modo-compartilhar .R-q-txt{font-size:19px!important}
+}
 </style>
 </head>
 <body>
+<div class="share-bar" id="shareBar">
+  <div class="share-bar-nome" id="shareBarNome">Relatório de Consulta</div>
+  <div class="share-bar-sub">Profª Joyce Neres · JN Consultoria de Treino</div>
+</div>
 <div class="app">
 <div class="hdr">
   <div class="hdr-l">
@@ -480,7 +521,10 @@ input[type=range]{height:3px;cursor:pointer;border:none;padding:0;background:var
   <div class="brow no-print" style="margin-top:0;margin-bottom:14px">
     <button class="btn bp" onclick="bldR()">Atualizar Relatório</button>
     <button class="btn bo" onclick="salvarPDF()" id="btnPDF">&#128424; Salvar PDF</button>
+    <button class="btn bw" onclick="enviarWhatsApp()" id="btnWhatsApp">&#128172; Enviar no WhatsApp</button>
+    <button class="btn bg" onclick="copiarLinkCompartilhar()" id="btnCopiarLink">&#128279; Copiar link</button>
   </div>
+  <div class="share-link-box no-print" id="shareLinkBox"></div>
   <div id="rltOut"></div>
 </div>
 </div>
@@ -781,6 +825,7 @@ function upD(){
 document.addEventListener('DOMContentLoaded',()=>{
   const frEl=document.getElementById('discFrase');
   if(frEl) frEl.addEventListener('input',()=>{ frEl.dataset.editado='1'; });
+  if(iniciarDeLinkCompartilhado()) return;
   carregarDadosPadrao();
 });
 
@@ -1214,6 +1259,10 @@ function aplicarDados(d){
     }
     if(S.hc){ S.hc.data.datasets[0].data=d.hexA; S.hc.data.datasets[1].data=d.hexI; }
   }
+  if(d.iate){ const ia=document.getElementById('iate'); if(ia) ia.value=d.iate; }
+  if(d.rFRS) S.rFRS=d.rFRS;
+  if(d.rFDR) S.rFDR=d.rFDR;
+  if(d.rACSM) S.rACSM=d.rACSM;
   cIMC();
   cFRS(); cFDR(); cACSM();
   if(S.dc) S.dc.update();
@@ -1225,6 +1274,121 @@ function carregarDadosPadrao(){
   aplicarDados(DADOS_VITORIA);
   bldR();
   gT(7);
+}
+
+// ===== COMPARTILHAR — link interativo para WhatsApp =====
+const REGISTRO_ALUNOS={
+  'vitoria-cardoso':{token:'vc2026',dados:DADOS_VITORIA}
+};
+
+function coletarDados(){
+  const gv=id=>document.getElementById(id)?.value??'';
+  const d={};
+  ['fn','fs','fi2','fp','fh','fci','fpas','fcol','fhdl','fniv','fdb','ftab','fah','fhd','fhdm','faf','fobj','fcon','fmed','fobs','fmot','fPF','fPM','ffFreq','ffInt','ffTipo','ffTempo','ffVol','ffProg','ffAfeto','ffObs','smS','smM','smA','smR','smT','fParecer'].forEach(k=>{d[k]=gv(k);});
+  d.disc={D:+gv('slD'),I:+gv('slI'),S:+gv('slS'),C:+gv('slC')};
+  d.discFrase=gv('discFrase');
+  d.estagios=[...S.es];
+  d.hexA=[]; d.hexI=[];
+  for(let i=0;i<6;i++){ d.hexA.push(+gv('hA'+i)); d.hexI.push(+gv('hI'+i)); }
+  d.iate=gv('iate');
+  d.rFRS=S.rFRS; d.rFDR=S.rFDR; d.rACSM=S.rACSM;
+  return d;
+}
+
+function codificarDados(d){
+  const json=JSON.stringify(d);
+  if(typeof LZString!=='undefined') return LZString.compressToEncodedURIComponent(json);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+
+function decodificarDados(enc){
+  try{
+    let json=null;
+    if(typeof LZString!=='undefined') json=LZString.decompressFromEncodedURIComponent(enc);
+    if(!json){
+      try{ json=decodeURIComponent(escape(atob(enc))); }catch(e){}
+    }
+    if(!json) return null;
+    return JSON.parse(json);
+  }catch(e){ return null; }
+}
+
+function urlBase(){
+  return location.origin+location.pathname;
+}
+
+function gerarLinkCompartilhar(){
+  bldR();
+  const enc=codificarDados(coletarDados());
+  return urlBase()+'?ver=1#d='+enc;
+}
+
+function mensagemWhatsApp(url,nome){
+  return 'Olá! Segue o relatório de consulta de *'+nome+'*, preparado pela Profª Joyce Neres (JN Consultoria de Treino).\n\nAbra o link abaixo para ler no celular com conforto:\n\n'+url+'\n\nQualquer dúvida, estou à disposição!\nProfª Joyce Neres';
+}
+
+function enviarWhatsApp(){
+  bldR();
+  const nome=document.getElementById('fn')?.value||'Aluno(a)';
+  const url=gerarLinkCompartilhar();
+  const box=document.getElementById('shareLinkBox');
+  if(box){ box.textContent=url; box.classList.add('on'); }
+  const txt=encodeURIComponent(mensagemWhatsApp(url,nome));
+  window.open('https://api.whatsapp.com/send?text='+txt,'_blank');
+}
+
+function copiarLinkCompartilhar(){
+  bldR();
+  const url=gerarLinkCompartilhar();
+  const box=document.getElementById('shareLinkBox');
+  if(box){ box.textContent=url; box.classList.add('on'); }
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>alert('Link copiado! Cole no WhatsApp para enviar aos pais.'));
+  }else{
+    prompt('Copie o link:',url);
+  }
+}
+
+function ativarModoCompartilhar(nome){
+  document.body.classList.add('modo-compartilhar');
+  const bar=document.getElementById('shareBarNome');
+  if(bar) bar.textContent='Relatório — '+(nome||'Consulta');
+  const meta=document.getElementById('metaRobots');
+  if(meta) meta.content='noindex,nofollow';
+  document.title='Relatório — '+(nome||'Consulta')+' | Profª Joyce Neres';
+  if(!TB) TB=document.querySelectorAll('#tabBar .tab');
+  if(!SC) SC=document.querySelectorAll('.sec');
+  gT(7);
+  setTimeout(()=>window.scrollTo(0,0),80);
+}
+
+function mostrarErroCompartilhar(){
+  document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;text-align:center;background:#0e0e0e;color:#e8e4dc"><div><p style="font-size:18px;margin-bottom:8px">Link inválido ou expirado</p><p style="font-size:14px;color:#7a7570">Peça um novo link à Profª Joyce Neres.</p></div></div>';
+}
+
+function iniciarDeLinkCompartilhado(){
+  const params=new URLSearchParams(location.search);
+  const slug=params.get('aluno');
+  const token=params.get('t');
+
+  if(slug){
+    const reg=REGISTRO_ALUNOS[slug];
+    if(!reg||reg.token!==token){ mostrarErroCompartilhar(); return true; }
+    aplicarDados(reg.dados);
+    bldR();
+    ativarModoCompartilhar(reg.dados.fn||slug);
+    return true;
+  }
+
+  if(params.get('ver')==='1'&&location.hash.startsWith('#d=')){
+    const dados=decodificarDados(location.hash.slice(3));
+    if(!dados){ mostrarErroCompartilhar(); return true; }
+    aplicarDados(dados);
+    bldR();
+    ativarModoCompartilhar(dados.fn);
+    return true;
+  }
+  return false;
 }
 
 // ===== SALVAR PDF — pág. 1–2: seções 1–5 | pág. 3: plano | pág. 4+: fechamento legível no celular =====
